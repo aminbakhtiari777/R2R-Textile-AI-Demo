@@ -1,5 +1,5 @@
 /* R2R service worker: precache everything for full offline use */
-const CACHE = "r2r-v5";
+const CACHE = "r2r-v6";
 const ASSETS = [
  "./",
  "index.html",
@@ -8,6 +8,17 @@ const ASSETS = [
  "js/data.js",
  "js/data-more.js",
  "js/data-mill.js",
+ "js/data-chain.js",
+ "assets/img/c1_p1.jpg",
+ "assets/img/c1_p2.jpg",
+ "assets/img/c1_p3.jpg",
+ "assets/img/c1_render.jpg",
+ "assets/img/c1_repeat.jpg",
+ "assets/img/c2_p1.jpg",
+ "assets/img/c2_p2.jpg",
+ "assets/img/c2_p3.jpg",
+ "assets/img/c2_render.jpg",
+ "assets/img/c2_repeat.jpg",
  "assets/img/f1_p1.jpg",
  "assets/img/f1_p2.jpg",
  "assets/img/f1_p3.jpg",

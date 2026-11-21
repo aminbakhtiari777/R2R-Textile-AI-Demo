@@ -384,3 +384,70 @@ html.lite .flow{animation:none!important;stroke-dasharray:none;opacity:.35}
 .mflow .mar{align-self:center;font-size:30px;color:var(--cy)}
 [dir=rtl] .mflow .mar{transform:scaleX(-1)}
 .approve.millbtn{background:linear-gradient(90deg,var(--vio),var(--cy));color:#05060b;box-shadow:0 0 40px rgba(34,211,238,.35)}
+/* v4: FULL CHAIN MODE (added) */
+.runbtns{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:18px 0}
+.approve.chainbtn{background:linear-gradient(90deg,#f5c46b,#fb923c,#f472b6);box-shadow:0 0 50px rgba(251,146,60,.45)}
+.samples.chains{grid-template-columns:repeat(2,minmax(0,1fr));gap:30px;margin-top:22px}
+.samples.chains .sample .tx{padding:16px 24px 18px}
+.samples.chains .sample h3{font-size:26px}
+.samples.chains .sample p{font-size:18px}
+.samples.chains .sample p.rl{color:var(--cy);font-size:16px}
+.samples.chains .zoom{top:14px;inset-inline-end:14px;width:56px;height:56px}
+.jr{flex:1;min-height:0;display:flex;align-items:stretch;gap:0;direction:ltr}
+.jr div{flex:1;background-size:cover;background-position:center}
+.jr div:nth-child(3){background-size:420px 420px;background-position:center;background-repeat:repeat;flex:.8}
+.jr i{flex:none;width:36px;display:grid;place-items:center;font-style:normal;font-size:26px;color:var(--cy);background:#0b0d16}
+.samples.chains .catb{top:72px}
+.step.side-mill{border-inline-start:3px solid rgba(34,211,238,.55)}
+.step.side-app{border-inline-start:3px solid rgba(244,114,182,.55)}
+.chin{display:grid;grid-template-columns:1fr 300px 1fr;gap:22px;align-items:center}
+.chin .side{display:flex;flex-direction:column;gap:6px}
+.chin .side img{width:100%;height:240px;object-fit:cover;border-radius:16px;cursor:zoom-in}
+.chin .side b{font-size:20px;margin-top:6px}.chin .side span{font-size:16px;color:var(--mut)}
+.chin .mid{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;color:var(--mut);font-size:17px}
+.chin .mid i{font-style:normal;font-size:40px;color:var(--cy)}
+[dir=rtl] .chin .mid i,[dir=rtl] .cfin .arrow i{transform:scaleX(-1);display:inline-block}
+.rl0,.roll{border-radius:50%;background-size:240px 240px;box-shadow:inset -14px -10px 28px rgba(0,0,0,.55),inset 10px 8px 22px rgba(255,255,255,.25),0 12px 30px rgba(0,0,0,.5);border:2px solid rgba(255,255,255,.25)}
+.rl0{width:130px;height:130px;animation:spinbg 6s linear infinite}
+@keyframes spinbg{to{background-position:220px 0}}
+.x1{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px;align-items:start}
+.x1t{height:470px;background-size:600px 600px;background-position:center}
+.pal{display:flex;gap:8px}.pal i{width:34px;height:26px;border-radius:7px;border:1px solid rgba(255,255,255,.3)}
+.trk{position:relative;height:230px;margin:6px 0 10px;direction:ltr}
+.trk .end{position:absolute;top:30px;width:170px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;z-index:2}
+.trk .end span{font-size:74px;line-height:1;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5))}
+.trk .end b{font-size:16px;color:var(--tx);line-height:1.4}
+.trk .e0{left:0}.trk .e1{right:0}
+[dir=rtl] .trk .e0{left:auto;right:0}[dir=rtl] .trk .e1{right:auto;left:0}
+.trk .line{position:absolute;left:150px;right:150px;top:150px;height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
+.trk .line i{position:absolute;inset-block:0;left:0;width:100%;background:linear-gradient(90deg,var(--cy),var(--pink));transform-origin:left;animation:lineg 4s ease-in-out both}
+[dir=rtl] .trk .line i{transform-origin:right}
+@keyframes lineg{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.trk .roll{position:absolute;top:44px;left:160px;width:110px;height:110px;animation:rollL 4s ease-in-out both;z-index:3}
+[dir=rtl] .trk .roll{left:auto;right:160px;animation-name:rollR}
+@keyframes rollL{0%{left:160px;background-position:0 0}100%{left:calc(100% - 270px);background-position:-660px 0}}
+@keyframes rollR{0%{right:160px;background-position:0 0}100%{right:calc(100% - 270px);background-position:660px 0}}
+.trk .roll em{position:absolute;bottom:-34px;left:50%;transform:translateX(-50%);font-style:normal;font-size:14px;font-weight:800;padding:3px 9px;border-radius:8px;background:#f5c46b;color:#1a1405;white-space:nowrap}
+.trk.still .roll{animation:none;left:calc(100% - 270px)}
+[dir=rtl] .trk.still .roll{left:auto;right:calc(100% - 270px)}
+.trk.still .line i{animation:none}
+.shipchips{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.shipchips span{padding:8px 14px;border-radius:12px;border:1px solid var(--line2);background:rgba(255,255,255,.04);font-size:17px;animation:chipin .6s var(--d,0s) both}
+.shipchips.still span{animation:none}
+@keyframes chipin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.cw{position:relative}.cw.pick{border:2px solid #f5c46b;box-shadow:0 0 30px rgba(245,196,107,.35)}
+.cw .pk{position:absolute;top:10px;inset-inline-start:10px;z-index:2;padding:4px 10px;border-radius:999px;background:#f5c46b;color:#1a1405;font-size:14px;font-weight:900}
+.chainfin h2{font-size:40px}
+.cfin{display:grid;grid-template-columns:1fr 210px 1fr;gap:20px;align-items:stretch;margin-top:16px;text-align:start}
+.cfin .col{border-radius:18px;border:1px solid var(--line2);background:rgba(0,0,0,.25);padding:16px 18px}
+.cfin .col:first-child{border-color:rgba(34,211,238,.45)}.cfin .col:last-child{border-color:rgba(244,114,182,.45)}
+.cfin h3{font-size:21px;margin-bottom:10px}
+.cfin .th{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.cfin .th img,.cfin .th .tl{width:100%;height:170px;object-fit:cover;border-radius:12px;cursor:zoom-in}
+.cfin .th .tl{background-size:300px 300px;background-position:center}
+.cfin ul{font-size:16px}
+.cfin .arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;font-size:15px;color:var(--mut)}
+.cfin .arrow i{font-style:normal;font-size:40px;color:var(--cy)}
+.roll.sm{width:100px;height:100px;animation:spinbg 6s linear infinite}
+.cval{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:16px}
+.cval span{padding:8px 14px;border-radius:12px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.4);font-size:17px}

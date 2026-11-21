@@ -176,9 +176,9 @@ SL.push(() => `<div class="slide hero" style="align-items:center;text-align:cent
   <div class="kicker" style="justify-content:center">${L('دموی زنده','Live demo')}</div>
   <div class="big gt" style="font-size:150px">${L('اجرا','RUN')}</div>
   <div class="sub">${L('یک رول پارچه — چند دقیقه — تصمیم تولید','One roll — a few minutes — a production decision')}</div>
-  <p class="lead" style="margin:0 auto 40px">${L('نُه پارچه‌ی نمونه — از ساتن و مخمل تا ژاکارد — یا عکس پارچه‌ی خود شما.','Nine sample fabrics — from satin and velvet to jacquard — or a photo of your own fabric.')}</p>
-  <div><button class="approve" data-act="demo" style="height:76px;font-size:28px;padding:0 50px">▶ ${L('شروع دمو','Start demo')}</button><button class="approve millbtn" data-act="mill" style="height:76px;font-size:28px;padding:0 44px;margin-inline-start:22px">🏭 ${L('حالت کارخانه نساجی','Mill mode')}</button></div>
-  <div class="note" style="margin-top:40px">${L('کلید D یا Enter · کلید M = حالت کارخانه','Press D or Enter · M = Mill mode')}</div></div>`);
+  <p class="lead" style="margin:0 auto 40px">${L('یک داستان پیوسته: از نبض بازار در کارخانه تا پست اینستاگرام در تولیدی — یا نُه پارچه‌ی نمونه، سه کارخانه، یا عکس پارچه‌ی خود شما.','One continuous story: from the market pulse at the mill to the Instagram post at the apparel maker — or nine sample fabrics, three mills, or a photo of your own fabric.')}</p>
+  <div class="runbtns"><button class="approve chainbtn" data-act="chain" style="height:84px;font-size:30px;padding:0 46px">⛓️ ${L('زنجیره‌ی کامل: کارخانه ← پوشاک','Full chain: mill → apparel')}</button><button class="approve" data-act="demo" style="height:76px;font-size:26px;padding:0 36px;margin-inline-start:22px">👕 ${L('حالت پوشاک','Apparel mode')}</button><button class="approve millbtn" data-act="mill" style="height:76px;font-size:26px;padding:0 36px;margin-inline-start:22px">🏭 ${L('حالت کارخانه نساجی','Mill mode')}</button></div>
+  <div class="note" style="margin-top:40px">${L('Enter یا C = زنجیره‌ی کامل · A = پوشاک · M = کارخانه','Enter or C = Full chain · A = Apparel · M = Mill')}</div></div>`);
 SL.push(() => `<div class="slide hero" style="align-items:center;text-align:center">
   <div class="big gt" style="font-size:130px">${L('پرسش؟','Questions?')}</div>
   <div class="sub">${L('سؤال فنی‌تان را بپرسید — ایجنت پاسخ می‌دهد.','Ask your technical question — the agent answers.')}</div>
@@ -267,7 +267,8 @@ const S_DEP=() => `<div class="slide">${head(L('توسعه‌ی آینده · م
 function renderSlides(){
   const box=$('#slides'); box.innerHTML=SL.map(f=>f()).join('');
   box.querySelectorAll('.slide').forEach((el,i)=>el.classList.toggle('on', i===S.slide));
-  box.querySelectorAll('[data-act=demo]').forEach(b=>b.onclick=()=>openDemo());
+  box.querySelectorAll('[data-act=demo]').forEach(b=>b.onclick=()=>openApparel());
+  box.querySelectorAll('[data-act=chain]').forEach(b=>b.onclick=()=>openChain());
   box.querySelectorAll('[data-act=mill]').forEach(b=>b.onclick=()=>openMill());
   box.querySelectorAll('.node').forEach(n=>n.onclick=()=>{archHold=Date.now()+12000;archShow(+n.dataset.ag);});
   onSlideChange();
@@ -301,7 +302,7 @@ const MSG={
  A6:{fa:['الان داره کپشن فارسی اینستاگرام رو می‌نویسه...','الان داره ادعاهای تبلیغ رو با شناسنامه‌ی پارچه چک می‌کنه...'],en:['Writing the Persian Instagram caption...','Checking marketing claims against the fabric passport...']},
  A8:{fa:['الان داره برنامه‌ی کنترل کیفیت بصری رو آماده می‌کنه...'],en:['Preparing the vision QC plan...']}
 };
-const R={ pmode:'apparel', sample:null, idx:-1, done:[], waiting:false, gen:0, cur:null, skip:false, paused:false, t0:0, t1:0, approvals:{}, resolver:null, view:'pick' };
+const R={ pmode:'chain', sample:null, idx:-1, done:[], waiting:false, gen:0, cur:null, skip:false, paused:false, t0:0, t1:0, approvals:{}, resolver:null, view:'pick' };
 const alive=g=>g===R.gen;
 function sleep(ms,g){return new Promise(res=>{let left=ms;const tick=()=>{if(!alive(g))return res(false);if(R.skip&&!R.waiting)return res(true);if(!R.paused)left-=50;if(left<=0)return res(true);setTimeout(tick,50);};setTimeout(tick,50);});}
 const smp=()=>R.sample;
@@ -313,6 +314,7 @@ const SKEYS=()=>Object.keys(window.R2R_SAMPLES).sort((a,b)=>+a.slice(1)-+b.slice
 const rollTxt=s=>s.roll?L(`رول ${N(s.roll.len)} متر × ${N(s.roll.width)} سانتی‌متر`,`Roll ${s.roll.len} m × ${s.roll.width} cm`):'';
 function renderPick(){
   R.view='pick'; R.gen++; R.waiting=false; R.resolver=null;
+  if(R.pmode==='chain') return renderChainPick();
   if(R.pmode==='mill') return renderMillPick();
   const ss=window.R2R_SAMPLES;
   $('#demo').innerHTML=`<div class="demo-pick"><div class="pickhd"><div class="kicker">${L('دموی زنده · مرحله‌ی ۱','Live demo · step 1')}</div>${modeSw()}</div><h1 class="t" style="margin-bottom:10px">${L('یک رول پارچه انتخاب کنید','Choose a fabric roll')}</h1>
@@ -324,14 +326,14 @@ function renderPick(){
   $('#file').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>startRun({id:'up',upload:true,swatch:rd.result,name:{fa:'پارچه‌ی آپلودشده',en:'Uploaded fabric'},short:{fa:f.name,en:f.name}});rd.readAsDataURL(f);};
   bindModeSw();
 }
-function startRun(s){ STEPS=(s&&s.mill)?MSTEPS:ASTEPS; R.sample=s; R.idx=-1; R.done=['IN']; R.waiting=false; R.resolver=null; R.approvals={}; R.paused=false; R.skip=false; R.cur=null; R.t0=Date.now(); R.t1=0; R.view='run'; renderRun(); loop(0); }
+function startRun(s){ STEPS=(s&&s.chain)?CSTEPS:(s&&s.mill)?MSTEPS:ASTEPS; R.sample=s; R.idx=-1; R.done=['IN']; R.waiting=false; R.resolver=null; R.approvals={}; R.paused=false; R.skip=false; R.cur=null; R.t0=Date.now(); R.t1=0; R.view='run'; renderRun(); loop(0); }
 
 function renderRun(){
   const s=smp();
   $('#demo').innerHTML=`<div class="runview"><div class="rail">
-     <div class="src-card"><img src="${s.swatch}" alt="" ${lbA(s.swatch,tx(s.name))}><div><b>${tx(s.name)}</b><span>${(s.upload||s.mill)?tx(s.short):rollTxt(s)}</span></div></div>
+     <div class="src-card"><img src="${s.swatch}" alt="" ${lbA(s.swatch,tx(s.name))}><div><b>${tx(s.name)}</b><span>${(s.upload||s.mill||s.chain)?tx(s.short):rollTxt(s)}</span></div></div>
      <div class="steps" id="steps"></div>
-     <div style="display:flex;gap:10px"><button class="ghost" id="bBack">↩ ${s.mill?L('کارخانه‌ی دیگر','Other mill'):L('پارچه‌ی دیگر','Other fabric')}</button><button class="ghost" id="bRe">↺ ${L('از اول','Restart')}</button></div>
+     <div style="display:flex;gap:10px"><button class="ghost" id="bBack">↩ ${s.chain?L('زنجیره‌ی دیگر','Other chain'):s.mill?L('کارخانه‌ی دیگر','Other mill'):L('پارچه‌ی دیگر','Other fabric')}</button><button class="ghost" id="bRe">↺ ${L('از اول','Restart')}</button></div>
    </div><div class="main"><div class="status" id="status"><div class="spin"></div><div class="msg" id="msg"></div><div class="ctl"><button class="ghost" id="bPause" title="Pause">${R.paused?'▶':'⏸'}</button><button class="ghost" id="bSkip">⏭ ${L('رد شو','Skip')}</button></div></div><div class="out" id="out"></div></div></div>`;
   $('#bBack').onclick=()=>renderPick(); $('#bRe').onclick=()=>startRun(R.sample);
   $('#bPause').onclick=()=>{R.paused=!R.paused;$('#bPause').textContent=R.paused?'▶':'⏸';};
@@ -349,7 +351,7 @@ function renderRail(){
   el.innerHTML=STEPS.filter(k=>k!=='DONE').map(k=>{const isG=k[0]==='G';const st=R.done.includes(k)?'done':(STEPS[R.idx]===k?(isG?'wait':'run'):'');
     const nm=isG?tx(GT()[+k[1]-1].n):tx(agN(k));
     const lab=st==='done'?'✓':(st==='run'?L('در حال اجرا','running'):(st==='wait'?L('منتظر شما','awaiting you'):''));
-    return `<div class="step ${isG?'gate':''} ${st}" data-step="${k}"${st?' role="button" tabindex="0"':''}><span class="sid">${k}</span><span>${nm}</span><span class="st">${lab}</span></div>`;}).join('');
+    return `<div class="step ${isG?'gate':''} ${st}${isChain()?' side-'+chainSide(k):''}" data-step="${k}"${st?' role="button" tabindex="0"':''}><span class="sid">${k}</span><span>${nm}</span><span class="st">${lab}</span></div>`;}).join('');
 }
 function setStatus(text,cls){const st=$('#status');if(!st)return;st.className='status '+(cls||'');$('#msg').innerHTML=text;}
 function setStatusNow(){
@@ -399,6 +401,7 @@ function card0(k,anim){
   if(k==='DONE') return doneCard(a);
   if(k==='IN') return inCard(a);
   if(k[0]==='M') return millCard(k,a);
+  if(k[0]==='X') return chainCard(k,a);
   if(s.upload) return upCard(k,a);
   if(k==='A1') return `<div class="oc"${a}>${hdr('A1','🪪 '+L('شناسنامه‌ی دیجیتال پارچه','Fabric Digital Passport'))}
     <table class="tb"><thead><tr><th>${L('ویژگی','Attribute')}</th><th>${L('مقدار','Value')}</th><th>${L('اطمینان','Tier')}</th><th>${L('شاهد','Evidence')}</th><th>${L('ارجاع','Escalation')}</th></tr></thead><tbody>
@@ -438,7 +441,7 @@ function card0(k,anim){
   return '';
 }
 function inCard(a){
-  const s=smp(); if(s.mill) return millIn(a);
+  const s=smp(); if(s.chain) return chainIn(a); if(s.mill) return millIn(a);
   const live=`<div class="livenote" style="margin:14px 0 0">🤖 ${L('تحلیل زنده در دستیار انجام می‌شود — این عکس را در چت برای دستیار بفرستید.','Live analysis runs in the assistant — send this photo to the assistant in chat.')}</div>`;
   return `<div class="oc"${a}><div class="oh"><span class="aid">IN</span><h3>📷 ${L('ورودی: عکس رول پارچه','Input: fabric roll photo')}</h3></div>
    <div style="display:grid;grid-template-columns:440px 1fr;gap:26px;align-items:start"><img src="${s.swatch}" alt="" ${lbA(s.swatch,tx(s.name))} style="width:100%;height:300px;object-fit:${s.upload?'contain':'cover'};border-radius:18px;background:#000;display:block">
@@ -456,6 +459,7 @@ function gateCard(k,a){
    <div style="display:flex;gap:14px;margin-top:16px;align-items:center"><button class="approve" data-approve="1">✓ ${L('تأیید و ادامه','Approve & continue')}</button><span style="color:var(--dim);font-size:16px">${L('یا Enter / PageDown','or Enter / PageDown')}</span></div></div>`;
 }
 function doneCard(a){
+  if(smp().chain) return chainDone(a);
   if(smp().mill) return millDone(a);
   const s=smp(); const secs=Math.round(((R.t1||Date.now())-R.t0)/1000);
   const b=[L('شناسنامه‌ی پارچه','Fabric passport'),L('تحلیل بازار','Market brief'),L('۳ پیشنهاد + رندر','3 proposals + render'),L('تک‌پک و مارکر','Tech pack & marker'),L('برنامه‌ی تولید + «تولید نکن»','Plan + do-not-produce'),L('فایل ماشین','Machine file'),L('پست اینستاگرام','Instagram post')];
@@ -499,12 +503,12 @@ Object.assign(MSG,{
  M6:{fa:['الان داره فایل ماشین بافندگی/چاپ رو می‌سازه...','الان داره فایل رو با قرارداد تحویل اعتبارسنجی می‌کنه...'],en:['Building the loom / print machine file...','Validating the file against its handoff contract...']}
 });
 const isMill=()=>!!(R.sample&&R.sample.mill);
-const GT=()=>isMill()?MGATES:GATES;
-const agN=k=>k[0]==='M'?MAG[+k[1]-1].n:AG[+k[1]-1].n;
+const GT=()=>isChain()?CGATES:isMill()?MGATES:GATES;
+const agN=k=>k[0]==='X'?XAG[+k[1]-1].n:k[0]==='M'?MAG[+k[1]-1].n:AG[+k[1]-1].n;
 const MKEYS=()=>Object.keys(window.R2R_MILLS||{}).sort((a,b)=>+a.slice(1)-+b.slice(1));
 const MBADGE=()=>`<span class="illu millb">⚠️ ${L('داده‌ی نمونه‌ی نمایشی (Illustrative) · اتصال زنده در مرحله‌ی استقرار','Illustrative sample data · live connectors in deployment')}</span>`;
 const msrc=k=>tx((window.R2R_MSRC||{})[k]||k);
-const mvb=s=>s.id==='m2'?L('چاپ','PRINT'):L('بافت','WEAVE');
+const mvb=s=>(s.kind?s.kind==='print':s.id==='m2')?L('چاپ','PRINT'):L('بافت','WEAVE');
 const mdec=(d,s)=>`<span class="mdec ${d}">${d==='more'?(S.lang==='fa'?mvb(s)+' بیشتر':mvb(s)+' MORE'):d==='reduce'?L('کاهش','REDUCE'):d==='stop'?L('توقف','STOP'):d==='new'?L('طرح جدید','NEW'):L('ادامه','KEEP')}</span>`;
 const cov=p=>p.stock/p.sales;
 const covC=c=>c>6?'bad':c>3?'mid':'good';
@@ -526,7 +530,7 @@ function millCard(k,a){
     ${s.portfolio.map(p=>`<tr><td>${mdec(p.dec,s)}</td><td class="ltr"><b>${p.code}</b></td><td>${tx(p.n)}</td><td>${tx(p.why)}</td></tr>`).join('')}
     <tr class="newrow"><td>${mdec('new',s)}</td><td class="ltr"><b>${na.code}</b></td><td>${tx(na.n)}<div class="mono" style="font-size:14px;color:var(--dim)">${na.spec}</div></td><td>${tx(na.why)}<div style="color:var(--cy);margin-top:4px">${tx(na.plan)}</div></td></tr></tbody></table>
     <h3 class="msub">🎨 ${L('رنگ‌بندی فصل بعد','Next-season colourways')} — <span class="ltr">${na.code}</span></h3>
-    <div class="cws">${s.colourways.map((c,i)=>`<div class="cw"><img src="${c.img}" alt="" ${lbA(c.img,na.code+' · '+tx(c.n))}><div class="cb"><i style="background:${c.hex}"></i><b>${tx(c.n)}</b><span class="mono">${c.hex}</span></div></div>`).join('')}</div></div>`;}
+    <div class="cws">${s.colourways.map((c,i)=>`<div class="cw${s.chain&&i===s.pick?' pick':''}">${s.chain&&i===s.pick?`<span class="pk">⛓️ ${L('انتخاب برای زنجیره','Chosen for the chain')}</span>`:''}<img src="${c.img}" alt="" ${lbA(c.img,na.code+' · '+tx(c.n))}><div class="cb"><i style="background:${c.hex}"></i><b>${tx(c.n)}</b><span class="mono">${c.hex}</span></div></div>`).join('')}</div></div>`;}
   if(k==='M4'){ const d=s.dead, tot=d.rolls.reduce((t,r)=>t+r.m,0), mt=d.b2b.reduce((t,b)=>t+b.m,0);
     return `<div class="oc"${a}>${H(L('ریسک انبار راکد و فروش B2B','Dead-stock risk & B2B clearance'))}
     <div class="grid g2" style="gap:24px"><div><table class="tb"><thead><tr><th>${L('رول','Roll')}</th><th>${L('متراژ','Metres')}</th><th>${L('ماندگاری','Age')}</th><th>${L('ریسک','Risk')}</th></tr></thead><tbody>
@@ -568,9 +572,9 @@ function millDone(a){
    <div class="bundle">${b.map(x=>`<span class="tag" style="height:40px;font-size:17px">📦 ${x}</span>`).join('')}</div>
    <p style="margin-top:20px;font-size:17px;color:var(--dim)">${L('نام کارخانه فرضی است و همه‌ی مقادیر داده‌ی نمونه‌ی نمایشی‌اند؛ اتصال زنده در مرحله‌ی استقرار.','The mill name is fictional and all values are illustrative sample data; live connectors come with deployment.')}</p></div>`;
 }
-const modeSw=()=>`<div class="modesw" role="tablist"><button role="tab" data-mode="apparel" aria-selected="${R.pmode!=='mill'}" class="${R.pmode!=='mill'?'on':''}">👕 ${L('حالت پوشاک','Apparel mode')}</button><button role="tab" data-mode="mill" aria-selected="${R.pmode==='mill'}" class="${R.pmode==='mill'?'on':''}">🏭 ${L('حالت کارخانه نساجی','Mill mode')}</button></div>`;
+const modeSw=()=>`<div class="modesw" role="tablist"><button role="tab" data-mode="chain" aria-selected="${R.pmode==='chain'}" class="${R.pmode==='chain'?'on':''}">⛓️ ${L('زنجیره‌ی کامل','Full chain')}</button><button role="tab" data-mode="apparel" aria-selected="${R.pmode==='apparel'}" class="${R.pmode==='apparel'?'on':''}">👕 ${L('حالت پوشاک','Apparel mode')}</button><button role="tab" data-mode="mill" aria-selected="${R.pmode==='mill'}" class="${R.pmode==='mill'?'on':''}">🏭 ${L('حالت کارخانه نساجی','Mill mode')}</button></div>`;
 function bindModeSw(){ $('#demo').querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>setPickMode(b.dataset.mode)); }
-function setPickMode(m){ R.pmode=m==='mill'?'mill':'apparel'; renderPick(); }
+function setPickMode(m){ R.pmode=m==='mill'?'mill':m==='chain'?'chain':'apparel'; renderPick(); }
 function openMill(){ R.pmode='mill'; R.view='pick'; openDemo(); }
 function renderMillPick(){
   const ms=window.R2R_MILLS||{};
@@ -579,6 +583,73 @@ function renderMillPick(){
    <div class="samples mills">${MKEYS().map((k,i)=>{const m=ms[k];return `<div class="sample" role="button" tabindex="0" data-mill="${k}"><span class="num">${N(i+1)}</span><button class="zoom" ${lbA(m.swatch,tx(m.name))} title="${L('بزرگ‌نمایی','Enlarge')}">⤢</button><div class="im" style="background-image:url('${m.swatch}')"></div><span class="catb">${tx(m.cat)}</span><div class="tx"><h3>${tx(m.name)}</h3><p>${tx(m.short)}</p><p class="rl">❓ ${tx(m.profile[3][1])}</p></div></div>`;}).join('')}</div>
    <div class="millflow">${MAG.map(g=>`<span><b class="ltr">${g.id}</b> ${g.ic} ${tx(g.n)}</span>`).join('<i>→</i>')}<span class="g">🛡️ <b class="ltr">G1–G4</b></span></div></div>`;
   $('#demo').querySelectorAll('[data-mill]').forEach(b=>{b.onclick=e=>{ if(e.target.closest('[data-lb]')) return; startRun(ms[b.dataset.mill]); }; b.onkeydown=e=>{ if(e.target!==b) return; if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();startRun(ms[b.dataset.mill]);} };});
+  bindModeSw();
+}
+/* ---------------- FULL CHAIN MODE (added; apparel & mill flows untouched) ---------------- */
+const XAG=[
+ {id:'X1',ic:'🧵',n:{fa:'طرح جدید + فایل ماشین کارخانه',en:'New design + mill machine file'}},
+ {id:'X2',ic:'🚚',n:{fa:'رول از کارخانه خارج می‌شود',en:'The roll leaves the mill'}}];
+const CGATES=[
+ {id:'G1',n:{fa:'طرح و رنگ‌بندی تأیید شد',en:'Design & colourway approved'},own:{fa:'طراح ارشد + مدیر فروش کارخانه',en:'Mill chief designer + sales manager'},d:{fa:'پیش از صرف وقت ماشین و استرایک‌آف، سیگنال بازار و رنگ‌بندی انتخابی را انسان تأیید می‌کند.',en:'Before any machine time or strike-off is spent, a human approves the market signal and the chosen colourway.'}},
+ {id:'G2',n:{fa:'کیفیت و شید آزاد شد — رول قابل ارسال است',en:'Quality & shade released — the roll may ship'},own:{fa:'مدیر کنترل کیفیت / آزمایشگاه رنگ کارخانه',en:'Mill QC manager / colour lab'},d:{fa:'عیب‌های کم‌اطمینان بازبینی می‌شوند؛ فقط لات‌های داخل تلرانس با گزارش کیفیت روی شناسنامه‌ی رول ارسال می‌شوند.',en:'Low-confidence defects are reviewed; only in-tolerance lots ship, with the QC report attached to the roll passport.'}},
+ {id:'G3',n:{fa:'برنامه‌ی تولید پوشاک تأیید شد',en:'Apparel production plan approved'},own:{fa:'مدیر تولید تولیدی',en:'Apparel production manager'},d:{fa:'تعداد، سایزبندی و فهرست «تولید نکن» برای همین رول امضا می‌شود.',en:'Quantities, size curve and the do-not-produce list for this roll are signed off.'}},
+ {id:'G4',n:{fa:'فایل‌های برش و محتوا آزاد شد',en:'Cutting & content files released'},own:{fa:'الگوساز / سالن برش + مدیر برند',en:'Pattern maker / cutting room + brand manager'},d:{fa:'فایل DXF و پست اینستاگرام فقط پس از تأیید انسانی منتشر یا به برش فرستاده می‌شوند.',en:'The DXF and the Instagram post are only sent to cutting or published after human approval.'}}];
+const CSTEPS=['M1','M3','G1','X1','M5','G2','X2','A1','A3','A5','G3','A7','A6','G4','DONE'];
+Object.assign(MSG,{
+ X1:{fa:['الان داره طرح تکرارشونده‌ی بی‌درز رو با رنگ‌بندی انتخابی می‌سازه...','الان داره فایل ماشین کارخانه رو آماده می‌کنه...'],en:['Building the seamless repeat in the chosen colourway...','Preparing the mill’s machine file...']},
+ X2:{fa:['الان داره شناسنامه‌ی دیجیتال و گزارش کیفیت رو به رول می‌چسبونه...','رول داره از کارخانه به تولیدی پوشاک می‌ره...'],en:['Attaching the digital passport and QC report to the roll...','The roll is travelling from the mill to the apparel maker...']}
+});
+const isChain=()=>!!(R.sample&&R.sample.chain);
+const CKEYS=()=>Object.keys(window.R2R_CHAINS||{}).sort((a,b)=>+a.slice(1)-+b.slice(1));
+const chainSide=k=>{const i=CSTEPS.indexOf(k);return i>=0&&i<=CSTEPS.indexOf('X2')?'mill':'app';};
+function chainIn(a){
+  const s=smp();
+  return `<div class="oc"${a}><div class="oh"><span class="aid">IN</span><h3>⛓️ ${L('زنجیره‌ی کامل: از نبض بازار تا پست اینستاگرام','Full chain: from market pulse to Instagram post')}</h3>${MBADGE()}</div>
+   <div class="chin"><div class="side"><img src="${s.cover}" alt="" ${lbA(s.cover,tx(s.millName))}><b>🏭 ${tx(s.millName)}</b><span>${L('کارخانه: بازار ← طرح ← ماشین ← کیفیت','Mill: market → design → machine → quality')}</span></div>
+    <div class="mid"><div class="rl0" style="background-image:url('${s.design.repeat}')"></div><span>${L('یک رول، یک شناسنامه','One roll, one passport')}</span><i>→</i></div>
+    <div class="side"><img src="${s.render}" alt="" style="object-position:top" ${lbA(s.render,tx(s.maker))}><b>👗 ${tx(s.maker)}</b><span>${L('تولیدی: شناسنامه ← طرح لباس ← تولید ← محتوا','Maker: passport → garments → plan → content')}</span></div></div></div>`;
+}
+function chainCard(k,a){
+  const s=smp(), d=s.design, ag=XAG[+k[1]-1];
+  if(k==='X1'){ const mm=s.millMachine;
+    return `<div class="oc"${a}>${hdr('X1',ag.ic+' '+L('طرح جدید پارچه + فایل ماشین کارخانه','New fabric design + mill machine file'),MBADGE())}
+    <div class="x1"><div class="vis tile x1t" style="background-image:url('${d.repeat}')" ${lbA(d.repeat,d.code+' · '+tx(d.rep),1)}><div class="cap">🔁 ${L('طرح تکرارشونده‌ی بی‌درز','Seamless repeat')} · <span class="ltr">${d.code}</span></div></div>
+     <div><table class="tb"><tbody><tr><td>${L('کد طرح','Design code')}</td><td><b class="ltr">${d.code}</b></td></tr><tr><td>${L('طرح و رنگ','Design & colour')}</td><td>${tx(d.n)}</td></tr><tr><td>${L('پارچه','Base')}</td><td class="mono">${d.spec}</td></tr><tr><td>${L('تکرار','Repeat')}</td><td>${tx(d.rep)}</td></tr>
+      <tr><td>${L('رنگ‌های طرح','Design colours')}</td><td><div class="pal">${d.colours.map(c=>`<i style="background:${c}" title="${c}"></i>`).join('')}</div></td></tr></tbody></table>
+      <div class="file" style="margin-top:14px"><div class="fi">${mm.file.split('.').pop().toUpperCase()}</div><div><b class="mono">${mm.file}</b><p>${tx(mm.target)}</p></div></div>
+      <ul>${mm.checks.map(x=>`<li>${tx(x)}</li>`).join('')}</ul></div></div></div>`;}
+  if(k==='X2'){ const still=a?' still':''; const r=s.roll;
+    return `<div class="oc ship"${a}>${hdr('X2',ag.ic+' '+L('رول از کارخانه خارج می‌شود','The roll leaves the mill'),'')}
+    <div class="trk${still}"><div class="end e0"><span>🏭</span><b>${tx(s.millName)}</b></div><div class="line"><i></i></div>
+     <div class="roll" style="background-image:url('${d.repeat}')"><em>🪪 QR</em></div><div class="end e1"><span>👗</span><b>${tx(s.maker)}</b></div></div>
+    <div class="shipchips${still}"><span style="--d:.2s">📦 ${L('بسته‌بندی','Packed')} · <b class="ltr">${s.rollCode}</b></span><span style="--d:1.2s">🪪 ${L('شناسنامه + گزارش کیفیت + ΔE روی QR','Passport + QC report + ΔE on the QR')}</span><span style="--d:2.2s">🚚 ${L('ارسال','Shipped')} · ${L(`${N(r.len)} متر × ${N(r.width)} سانتی‌متر`,`${r.len} m × ${r.width} cm`)}</span><span style="--d:3.4s">📥 ${L('تحویل به تولیدی — شناسنامه از پیش پر شده است','Received by the maker — the passport arrives pre-filled')}</span></div>
+    <p class="mnote">${tx(s.ship)}</p></div>`;}
+  return '';
+}
+function chainDone(a){
+  const s=smp(); const secs=Math.round(((R.t1||Date.now())-R.t0)/1000); const p1=s.proposals[0];
+  const mo=[L('نبض بازار: طرح، رنگ، الیاف','Market pulse: designs, colours, fibres'),L('تصمیم بیشتر / کمتر / توقف','MORE / REDUCE / STOP decisions'),L('طرح جدید + رنگ‌بندی','New design + colourway')+` · <span class="ltr">${s.design.code}</span>`,L('فایل ماشین','Machine file')+` · <span class="mono">${s.millMachine.file}</span>`,L('گزارش عیب + امتیاز ۴ نقطه‌ای + ΔE','Defect report + 4-point score + ΔE')];
+  const ao=[L('شناسنامه‌ی پارچه (از پیش پر شده)','Fabric passport (pre-filled)'),L('۳ پیشنهاد لباس (۱ رد شده) + رندر','3 garment proposals (1 rejected) + render'),L('برنامه‌ی تولید + «تولید نکن»','Production plan + do-not-produce'),L('فایل برش','Cutting file')+` · <span class="mono">${s.machine.file}</span>`,L('پست اینستاگرام فارسی','Persian Instagram post')];
+  const units=s.proposals.reduce((t,p)=>t+p.units,0);
+  return `<div class="oc final chainfin"${a}><div class="ok">✅</div><h2 class="gt">${L('زنجیره‌ی کامل — از نبض بازار تا پست اینستاگرام','Full chain — from market pulse to Instagram post')}</h2>
+   <p>${L(`${N(secs)} ثانیه · ۹ مرحله‌ی هوش مصنوعی + جابه‌جایی رول · ۴ تأیید انسانی`,`${secs} s · 9 AI steps + the roll handoff · 4 human approvals`)}</p>
+   <div class="cfin"><div class="col"><h3>🏭 ${tx(s.millName)}</h3><div class="th"><div class="tl" style="background-image:url('${s.design.repeat}')" ${lbA(s.design.repeat,s.design.code,1)}></div><img src="${s.quality.boxed}" alt="" ${lbA(s.quality.boxed,tx(s.quality.insp))}></div><ul>${mo.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+    <div class="arrow"><div class="roll sm" style="background-image:url('${s.design.repeat}')"></div><b class="ltr">${s.rollCode}</b><span>${L('یک رول · یک شناسنامه','one roll · one passport')}</span><i>→</i></div>
+    <div class="col"><h3>👗 ${tx(s.maker)}</h3><div class="th"><img src="${s.render}" alt="" style="object-position:top" ${lbA(s.render,tx(s.renderCap))}><img src="${p1.img}" alt="" style="object-position:top" ${lbA(p1.img,p1.id+' · '+tx(p1.name))}></div><ul>${ao.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
+   <div class="cval"><span>📈 ${L('کارخانه: می‌داند چه ببافد/چاپ کند و چه را متوقف کند','Mill: knows what to weave/print and what to stop')}</span><span>🧾 ${L('تولیدی:','Maker:')} ${N(units)} ${L('لباس از یک رول، بدون حدس','garments from one roll, no guesswork')}</span><span>🔗 ${L('داده‌ی کیفیت همراه رول می‌رود — دوباره‌کاری نیست','Quality data travels with the roll — no rework')}</span></div>
+   <p style="margin-top:14px;font-size:16px;color:var(--dim)">${L('نام‌ها فرضی‌اند و همه‌ی مقادیر داده‌ی نمونه‌ی نمایشی‌اند؛ اتصال زنده در مرحله‌ی استقرار.','Names are fictional and all values are illustrative sample data; live connectors come with deployment.')}</p></div>`;
+}
+function openChain(){ R.pmode='chain'; R.view='pick'; openDemo(); }
+function openApparel(){ R.pmode='apparel'; R.view='pick'; openDemo(); }
+function renderChainPick(){
+  const cs=window.R2R_CHAINS||{};
+  $('#demo').innerHTML=`<div class="demo-pick"><div class="pickhd"><div class="kicker">${L('دموی زنده · زنجیره‌ی کامل','Live demo · Full chain')}</div>${modeSw()}</div><h1 class="t" style="margin-bottom:10px">${L('یک زنجیره انتخاب کنید: کارخانه ← تولیدی پوشاک','Choose a chain: mill → apparel maker')}</h1>
+   <div style="display:flex;gap:18px;align-items:center">${MBADGE()}<span style="color:var(--dim);font-size:17px">${L('کلیدهای ۱ و ۲ · پوشاک با کلید <bdi>A</bdi> · کارخانه با کلید <bdi>M</bdi>','Keys 1–2 · A = Apparel · M = Mill')}</span></div>
+   <div class="samples chains">${CKEYS().map((k,i)=>{const c=cs[k];return `<div class="sample" role="button" tabindex="0" data-chain="${k}"><span class="num">${N(i+1)}</span><button class="zoom" ${lbA(c.render,tx(c.renderCap))} title="${L('بزرگ‌نمایی','Enlarge')}">⤢</button>
+     <div class="jr"><div style="background-image:url('${c.cover}')"></div><i>→</i><div style="background-image:url('${c.design.repeat}')"></div><i>→</i><div style="background-image:url('${c.render}');background-position:top"></div></div><span class="catb">${tx(c.cat)}</span>
+     <div class="tx"><h3>${tx(c.name)}</h3><p>${tx(c.short)}</p><p class="rl">⏱ ${L('حدود ۶ تا ۸ دقیقه · ۱۴ مرحله · ۴ تأیید انسانی','About 6–8 min · 14 steps · 4 human approvals')}</p></div></div>`;}).join('')}</div>
+   <div class="millflow">${['M1 📡','M3 ⚖️','G1','X1 🧵','M5 👁️','G2','X2 🚚','A1 🪪','A3 🎨','A5 ⚖️','G3','A7 🏭','A6 📱','G4'].map(x=>`<span class="${x[0]==='G'?'g':''}"><b class="ltr">${x}</b></span>`).join('<i>→</i>')}</div></div>`;
+  $('#demo').querySelectorAll('[data-chain]').forEach(b=>{b.onclick=e=>{ if(e.target.closest('[data-lb]')) return; startRun(cs[b.dataset.chain]); }; b.onkeydown=e=>{ if(e.target!==b) return; if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();startRun(cs[b.dataset.chain]);} };});
   bindModeSw();
 }
 /* ---------------- CHROME / LANG / KEYS ---------------- */
@@ -612,7 +683,7 @@ function updNet(){
 }
 function renderHelp(){
   const touch=L('روی آیپد: برای اسلاید بعدی/قبلی انگشت را به چپ/راست بکشید یا دکمه‌های پایین صفحه را بزنید. روی هر تصویر بزنید تا بزرگ شود.','On iPad: swipe left/right or use the arrows at the bottom to change slides. Tap any image to enlarge it.');
-  const rows=[['PageDown / Space / ↓',L('بعدی (در دمو: ادامه / تأیید)','Next (demo: advance / approve)')],['PageUp / ↑',L('قبلی (در دمو: انتخاب پارچه)','Previous (demo: back to fabrics)')],[S.lang==='fa'?'← / →':'→ / ←',L('بعدی / قبلی (جهت با زبان عوض می‌شود)','Next / previous (direction follows language)')],['D',L('دموی زنده','Live demo')],['Esc / S',L('بازگشت','Back')],['1 … 9 · U',L('انتخاب پارچه در دمو · U = آپلود عکس','Pick a fabric in the demo · U = upload a photo')],['M',L('حالت کارخانه نساجی (در دمو: تعویض پوشاک / کارخانه · ۱–۳ = کارخانه)','Mill mode (in the demo: toggle Apparel / Mill · 1–3 = mill)')],['L',L('تغییر زبان فارسی / English','Toggle FA / EN')],['F',L('تمام‌صفحه','Fullscreen')],['Home / End',L('اولین / آخرین اسلاید','First / last slide')],['?',L('راهنما','Help')]];
+  const rows=[['PageDown / Space / ↓',L('بعدی (در دمو: ادامه / تأیید)','Next (demo: advance / approve)')],['PageUp / ↑',L('قبلی (در دمو: انتخاب پارچه)','Previous (demo: back to fabrics)')],[S.lang==='fa'?'← / →':'→ / ←',L('بعدی / قبلی (جهت با زبان عوض می‌شود)','Next / previous (direction follows language)')],['D',L('دموی زنده','Live demo')],['Esc / S',L('بازگشت','Back')],['1 … 9 · U',L('انتخاب پارچه در دمو · U = آپلود عکس','Pick a fabric in the demo · U = upload a photo')],['C',L('زنجیره‌ی کامل کارخانه ← پوشاک (در دمو: ۱–۲ = زنجیره)','Full chain mill → apparel (in the demo: 1–2 = chain)')],['A',L('حالت پوشاک','Apparel mode')],['M',L('حالت کارخانه نساجی (در دمو: تعویض پوشاک / کارخانه · ۱–۳ = کارخانه)','Mill mode (in the demo: toggle Apparel / Mill · 1–3 = mill)')],['L',L('تغییر زبان فارسی / English','Toggle FA / EN')],['F',L('تمام‌صفحه','Fullscreen')],['Home / End',L('اولین / آخرین اسلاید','First / last slide')],['?',L('راهنما','Help')]];
   $('#help').innerHTML=`<div class="card"><button class="hx" aria-label="close">✕</button><h3>⌨️ ${L('راهنما و کلیدها','Help & shortcuts')}</h3><p style="margin-bottom:12px">👆 ${touch}</p><table>${rows.map(r=>`<tr><td><kbd>${r[0]}</kbd></td><td>${r[1]}</td></tr>`).join('')}</table><p style="margin-top:16px;font-size:17px">${L('برای بستن، هر جا بزنید یا هر کلیدی را فشار دهید.','Tap anywhere or press any key to close.')}</p></div>`;
 }
 function fit(){const w=window.innerWidth,h=window.innerHeight;const sc=Math.min(w/1920,h/1080);$('#stage').style.transform=`scale(${sc})`;S.scale=sc;
@@ -679,11 +750,16 @@ document.addEventListener('keydown',e=>{
     if(k==='Home'){go(0);return;} if(k==='End'){go(SL.length-1);return;}
     if(k==='d'||k==='D'){openDemo();return;}
     if(k==='m'||k==='M'){openMill();return;}
-    if(k==='Enter'&&$('#slides .slide.on [data-act=demo]')){e.preventDefault();openDemo();return;}
+    if(k==='c'||k==='C'){openChain();return;}
+    if(k==='a'||k==='A'){openApparel();return;}
+    if(k==='Enter'&&$('#slides .slide.on [data-act=demo]')){e.preventDefault();openChain();return;}
   } else {
     if(k==='Escape'||k==='s'||k==='S'){ if(R.view==='run'&&k==='Escape') renderPick(); else closeDemo(); return; }
     if(R.view==='pick'){
       if(k==='m'||k==='M'){setPickMode(R.pmode==='mill'?'apparel':'mill');return;}
+      if(k==='c'||k==='C'){setPickMode('chain');return;}
+      if(k==='a'||k==='A'){setPickMode('apparel');return;}
+      if(R.pmode==='chain'){ if(/^[1-9]$/.test(k)){const id=CKEYS()[+k-1]; if(id) startRun(window.R2R_CHAINS[id]); return;} if(k==='u'||k==='U'||k==='0') return; }
       if(R.pmode==='mill'){ if(/^[1-9]$/.test(k)){const id=MKEYS()[+k-1]; if(id) startRun(window.R2R_MILLS[id]); return;} if(k==='u'||k==='U'||k==='0') return; }
       if(/^[1-9]$/.test(k)){const id=SKEYS()[+k-1]; if(id){startRun(window.R2R_SAMPLES[id]);return;}}
       if(k==='u'||k==='U'||k==='0'){$('#file').click();return;}
@@ -733,7 +809,7 @@ function init(){
       chk();
     }).catch(()=>{});
   }
-  window.R2R={openMill,setPickMode,mills:window.R2R_MILLS,go,openDemo,closeDemo,startRun,advance,approve,setLang,setLite,lbClose,state:S,run:R,lb:LB,samples:window.R2R_SAMPLES};
+  window.R2R={openChain,openApparel,chains:window.R2R_CHAINS,openMill,setPickMode,mills:window.R2R_MILLS,go,openDemo,closeDemo,startRun,advance,approve,setLang,setLite,lbClose,state:S,run:R,lb:LB,samples:window.R2R_SAMPLES};
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
