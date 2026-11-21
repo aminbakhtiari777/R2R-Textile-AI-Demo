@@ -1,5 +1,5 @@
 /* R2R demo — sample data. ALL VALUES ARE ILLUSTRATIVE (hypothetical), not measured results. */
-window.R2R_CACHE = "r2r-v6";
+window.R2R_CACHE = "r2r-v7";
 window.R2R_SAMPLES = {
   f1: {
     id: 'f1',

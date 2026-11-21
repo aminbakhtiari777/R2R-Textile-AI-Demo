@@ -1,5 +1,5 @@
 /* R2R service worker: precache everything for full offline use */
-const CACHE = "r2r-v6";
+const CACHE = "r2r-v7";
 const ASSETS = [
  "./",
  "index.html",
