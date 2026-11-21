@@ -1,10 +1,12 @@
 /* R2R demo — sample data. ALL VALUES ARE ILLUSTRATIVE (hypothetical), not measured results. */
+window.R2R_CACHE = "r2r-v4";
 window.R2R_SAMPLES = {
   f1: {
     id: 'f1',
     swatch: 'assets/img/f1_swatch.jpg',
     name: { fa: 'وویل چاپی گل‌دار (سلولزی)', en: 'Printed floral voile (cellulosic)' },
     short: { fa: 'تاری‌پودی · چاپ دیجیتال · سبک', en: 'Woven · digitally printed · lightweight' },
+    cat: { fa: 'مانتو و پیراهن بهاره', en: 'Spring manto & dresses' },
     roll: { len: 45, width: 150, usable: 146, reserve: 3.5 },
     passport: [
       { a: { fa: 'ساختار', en: 'Construction' }, v: { fa: 'تاری‌پودی، بافت ساده (Plain weave)', en: 'Woven, plain weave' }, t: 'T1', m: { fa: 'تصویر ماکرو', en: 'Macro image' } },
@@ -41,6 +43,7 @@ window.R2R_SAMPLES = {
     swatch: 'assets/img/f2_swatch.jpg',
     name: { fa: 'دنیم جناغی ایندیگو (Rigid)', en: 'Indigo denim twill (rigid)' },
     short: { fa: 'سرژه ۳/۱ · سنگین · بدون کش', en: '3/1 twill · heavy · non-stretch' },
+    cat: { fa: 'دنیم روزمره', en: 'Casual denim' },
     roll: { len: 45, width: 150, usable: 145, reserve: 3 },
     passport: [
       { a: { fa: 'ساختار', en: 'Construction' }, v: { fa: 'سرژه ۳/۱ راست‌گرد (RHT)', en: '3/1 right-hand twill' }, t: 'T1', m: { fa: 'تصویر ماکرو، زاویه‌ی خطوط', en: 'Macro image, twill angle' } },
@@ -75,6 +78,7 @@ window.R2R_SAMPLES = {
     swatch: 'assets/img/f3_swatch.jpg',
     name: { fa: 'سینگل‌جرسی کشی (پنبه/الاستین)', en: 'Stretch single jersey (cotton/elastane)' },
     short: { fa: 'حلقوی پودی · کشسان · نرم', en: 'Weft knit · stretch · soft' },
+    cat: { fa: 'بیسیک و حلقوی', en: 'Basics & jersey' },
     roll: { len: 45, width: 150, usable: 146, reserve: 3 },
     passport: [
       { a: { fa: 'ساختار', en: 'Construction' }, v: { fa: 'حلقوی پودی، سینگل‌جرسی', en: 'Weft knit, single jersey' }, t: 'T1', m: { fa: 'تصویر ماکرو (حلقه‌ها)، لبه‌ی لوله‌شونده', en: 'Macro (loops), curling edge' } },

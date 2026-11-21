@@ -176,7 +176,7 @@ SL.push(() => `<div class="slide hero" style="align-items:center;text-align:cent
   <div class="kicker" style="justify-content:center">${L('دموی زنده','Live demo')}</div>
   <div class="big gt" style="font-size:150px">${L('اجرا','RUN')}</div>
   <div class="sub">${L('یک رول پارچه — چند دقیقه — تصمیم تولید','One roll — a few minutes — a production decision')}</div>
-  <p class="lead" style="margin:0 auto 40px">${L('سه پارچه‌ی نمونه، یا عکس پارچه‌ی خود شما.','Three sample fabrics, or a photo of your own fabric.')}</p>
+  <p class="lead" style="margin:0 auto 40px">${L('نُه پارچه‌ی نمونه — از ساتن و مخمل تا ژاکارد — یا عکس پارچه‌ی خود شما.','Nine sample fabrics — from satin and velvet to jacquard — or a photo of your own fabric.')}</p>
   <div><button class="approve" data-act="demo" style="height:76px;font-size:28px;padding:0 50px">▶ ${L('شروع دمو','Start demo')}</button></div>
   <div class="note" style="margin-top:40px">${L('کلید D یا Enter','Press D or Enter')}</div></div>`);
 SL.push(() => `<div class="slide hero" style="align-items:center;text-align:center">
@@ -239,6 +239,7 @@ function updChrome(){
   const p=$('#progress'), c=$('#counter');
   if(S.mode==='slides'){ p.style.width=((S.slide+1)/SL.length*100)+'%'; c.textContent=`${N(S.slide+1)} / ${N(SL.length)}`; }
   else { p.style.width='100%'; c.textContent=L('حالت دموی زنده','Live demo mode'); }
+  document.body.classList.toggle('demo',S.mode==='demo'); $('#bPrev').disabled=S.slide===0; $('#bNext').disabled=S.slide===SL.length-1;
   $('#btnSlides').classList.toggle('hot',S.mode==='slides'); $('#btnDemo').classList.toggle('hot',S.mode==='demo');
 }
 /* ---------------- DEMO ENGINE ---------------- */
@@ -248,7 +249,7 @@ const MSG={
  A2:{fa:['الان داره سیگنال‌های بازار فارسی رو می‌خونه...','الان داره ترندهای فصل رو با پایگاه دانش تطبیق می‌ده...','الان داره جهت تقاضا رو جمع‌بندی می‌کنه...'],en:['Reading Persian market signals...','Matching seasonal trends against the knowledge base...','Summarising demand direction...']},
  A3:{fa:['الان داره ویژگی‌های پارچه رو به قیدهای طراحی تبدیل می‌کنه...','الان داره سه پیشنهاد لباس اسکچ می‌کنه...','الان داره فیت هر طرح رو با پارچه چک می‌کنه...','الان داره روی مدل رندر می‌گیره...'],en:['Turning fabric properties into design constraints...','Sketching three garment proposals...','Checking each design\'s fit against the fabric...','Rendering on a model...']},
  A4:{fa:['الان داره مصرف پارچه‌ی هر مدل رو حساب می‌کنه...','الان داره جهت برش و نکات مارکر رو تعیین می‌کنه...'],en:['Calculating fabric consumption per style...','Setting lay direction and marker notes...']},
- A5:{fa:['الان داره امکان‌سنجی فنی و شواهد بازار رو ترکیب می‌کنه...','الان داره تعداد رو زیر محدودیت رول ۴۵ متری بهینه می‌کنه...','الان داره فهرست «تولید نکن» رو می‌نویسه...'],en:['Combining technical feasibility with market evidence...','Optimising quantities under the 45 m roll constraint...','Writing the do-not-produce list...']},
+ A5:{fa:['الان داره امکان‌سنجی فنی و شواهد بازار رو ترکیب می‌کنه...','الان داره تعداد رو زیر محدودیت طول رول بهینه می‌کنه...','الان داره فهرست «تولید نکن» رو می‌نویسه...'],en:['Combining technical feasibility with market evidence...','Optimising quantities under the roll-length constraint...','Writing the do-not-produce list...']},
  A7:{fa:['الان داره فایل آماده‌ی ماشین رو می‌سازه...','الان داره فایل رو با قرارداد تحویل اعتبارسنجی می‌کنه...'],en:['Building the machine-ready file...','Validating the file against its handoff contract...']},
  A6:{fa:['الان داره کپشن فارسی اینستاگرام رو می‌نویسه...','الان داره ادعاهای تبلیغ رو با شناسنامه‌ی پارچه چک می‌کنه...'],en:['Writing the Persian Instagram caption...','Checking marketing claims against the fabric passport...']},
  A8:{fa:['الان داره برنامه‌ی کنترل کیفیت بصری رو آماده می‌کنه...'],en:['Preparing the vision QC plan...']}
@@ -261,14 +262,17 @@ const smp=()=>R.sample;
 function openDemo(){ S.mode='demo'; $('#slides').style.display='none'; $('#demo').classList.add('on'); archStop(); if(R.view==='pick'||!R.sample) renderPick(); else renderRun(); updChrome(); }
 function closeDemo(){ S.mode='slides'; $('#demo').classList.remove('on'); $('#slides').style.display=''; go(S.slide); }
 
+const SKEYS=()=>Object.keys(window.R2R_SAMPLES).sort((a,b)=>+a.slice(1)-+b.slice(1));
+const rollTxt=s=>s.roll?L(`رول ${N(s.roll.len)} متر × ${N(s.roll.width)} سانتی‌متر`,`Roll ${s.roll.len} m × ${s.roll.width} cm`):'';
 function renderPick(){
   R.view='pick'; R.gen++; R.waiting=false; R.resolver=null;
   const ss=window.R2R_SAMPLES;
   $('#demo').innerHTML=`<div class="demo-pick"><div class="kicker">${L('دموی زنده · مرحله‌ی ۱','Live demo · step 1')}</div><h1 class="t" style="margin-bottom:10px">${L('یک رول پارچه انتخاب کنید','Choose a fabric roll')}</h1>
-   <div style="display:flex;gap:18px;align-items:center"><span class="illu">⚠️ ${L('داده‌های نمونه، مثال‌های نمایشی (Illustrative) هستند، نه نتیجه‌ی اندازه‌گیری','Sample data are illustrative examples, not measured results')}</span><span style="color:var(--dim);font-size:17px">${L('کلیدهای ۱ تا ۴','Keys 1–4')}</span></div>
-   <div class="samples">${['f1','f2','f3'].map((k,i)=>`<button class="sample" data-s="${k}"><span class="num">${N(i+1)}</span><div class="im" style="background-image:url('${ss[k].swatch}')"></div><div class="tx"><h3>${tx(ss[k].name)}</h3><p>${tx(ss[k].short)}</p><p style="color:var(--cy)">${L('رول ۴۵ متر × ۱۵۰ سانتی‌متر','Roll 45 m × 150 cm')}</p></div></button>`).join('')}
-    <label class="sample upload" tabindex="0" id="upl"><span class="num">${N(4)}</span><div class="im"><div class="plus">+</div></div><div class="tx"><h3>${L('عکس پارچه‌ی خودتان','Your own fabric photo')}</h3><p>${L('آپلود از همین کامپیوتر — تحلیل زنده در دستیار انجام می‌شود','Upload from this computer — live analysis runs in the assistant')}</p></div><input type="file" accept="image/*" id="file" style="display:none"></label></div></div>`;
-  $('#demo').querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>startRun(ss[b.dataset.s]));
+   <div style="display:flex;gap:18px;align-items:center"><span class="illu">⚠️ ${L('داده‌های نمونه، مثال‌های نمایشی (Illustrative) هستند، نه نتیجه‌ی اندازه‌گیری','Sample data are illustrative examples, not measured results')}</span><span style="color:var(--dim);font-size:17px">${L('کلیدهای ۱ تا ۹ · آپلود با کلید <bdi>U</bdi>','Keys 1–9 · U = upload')}</span></div>
+   <div class="samples many">${SKEYS().map((k,i)=>`<div class="sample" role="button" tabindex="0" data-s="${k}"><span class="num">${N(i+1)}</span><button class="zoom" ${lbA(ss[k].swatch,tx(ss[k].name))} title="${L('بزرگ‌نمایی','Enlarge')}">⤢</button><div class="im" style="background-image:url('${ss[k].swatch}')"></div>${ss[k].cat?`<span class="catb">${tx(ss[k].cat)}</span>`:''}<div class="tx"><h3>${tx(ss[k].name)}</h3><p>${tx(ss[k].short)}</p><p class="rl">${rollTxt(ss[k])}</p></div></div>`).join('')}
+    <label class="sample upload" tabindex="0" id="upl"><span class="num">U</span><div class="im"><div class="plus">+</div></div><div class="tx"><h3>${L('عکس پارچه‌ی خودتان','Your own fabric photo')}</h3><p>${L('آپلود از همین دستگاه — تحلیل زنده در دستیار انجام می‌شود','Upload from this device — live analysis runs in the assistant')}</p></div><input type="file" accept="image/*" id="file" style="display:none"></label></div></div>`;
+  $('#demo').querySelectorAll('[data-s]').forEach(b=>{b.onclick=e=>{ if(e.target.closest('[data-lb]')) return; startRun(ss[b.dataset.s]); }; b.onkeydown=e=>{ if(e.target!==b) return; if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();startRun(ss[b.dataset.s]);} };});
+  const up=$('#upl'); up.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();$('#file').click();} };
   $('#file').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>startRun({id:'up',upload:true,swatch:rd.result,name:{fa:'پارچه‌ی آپلودشده',en:'Uploaded fabric'},short:{fa:f.name,en:f.name}});rd.readAsDataURL(f);};
 }
 function startRun(s){ R.sample=s; R.idx=-1; R.done=['IN']; R.waiting=false; R.resolver=null; R.approvals={}; R.paused=false; R.skip=false; R.cur=null; R.t0=Date.now(); R.t1=0; R.view='run'; renderRun(); loop(0); }
@@ -276,7 +280,7 @@ function startRun(s){ R.sample=s; R.idx=-1; R.done=['IN']; R.waiting=false; R.re
 function renderRun(){
   const s=smp();
   $('#demo').innerHTML=`<div class="runview"><div class="rail">
-     <div class="src-card"><img src="${s.swatch}" alt=""><div><b>${tx(s.name)}</b><span>${s.upload?tx(s.short):L('رول ۴۵ m × ۱۵۰ cm','Roll 45 m × 150 cm')}</span></div></div>
+     <div class="src-card"><img src="${s.swatch}" alt="" ${lbA(s.swatch,tx(s.name))}><div><b>${tx(s.name)}</b><span>${s.upload?tx(s.short):rollTxt(s)}</span></div></div>
      <div class="steps" id="steps"></div>
      <div style="display:flex;gap:10px"><button class="ghost" id="bBack">↩ ${L('پارچه‌ی دیگر','Other fabric')}</button><button class="ghost" id="bRe">↺ ${L('از اول','Restart')}</button></div>
    </div><div class="main"><div class="status" id="status"><div class="spin"></div><div class="msg" id="msg"></div><div class="ctl"><button class="ghost" id="bPause" title="Pause">${R.paused?'▶':'⏸'}</button><button class="ghost" id="bSkip">⏭ ${L('رد شو','Skip')}</button></div></div><div class="out" id="out"></div></div></div>`;
@@ -292,10 +296,11 @@ function renderRun(){
 }
 function renderRail(){
   const el=$('#steps'); if(!el) return;
+  el.onclick=e=>{const st=e.target.closest('[data-step]'); if(!st) return; const c=$('#out [data-k="'+st.dataset.step+'"]'); if(c){const o=$('#out'); o.scrollTop=Math.max(0,c.offsetTop-o.offsetTop-6); c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash');}};
   el.innerHTML=STEPS.filter(k=>k!=='DONE').map(k=>{const isG=k[0]==='G';const st=R.done.includes(k)?'done':(STEPS[R.idx]===k?(isG?'wait':'run'):'');
     const nm=isG?tx(GATES[+k[1]-1].n):tx(AG[+k[1]-1].n);
     const lab=st==='done'?'✓':(st==='run'?L('در حال اجرا','running'):(st==='wait'?L('منتظر شما','awaiting you'):''));
-    return `<div class="step ${isG?'gate':''} ${st}"><span class="sid">${k}</span><span>${nm}</span><span class="st">${lab}</span></div>`;}).join('');
+    return `<div class="step ${isG?'gate':''} ${st}" data-step="${k}"${st?' role="button" tabindex="0"':''}><span class="sid">${k}</span><span>${nm}</span><span class="st">${lab}</span></div>`;}).join('');
 }
 function setStatus(text,cls){const st=$('#status');if(!st)return;st.className='status '+(cls||'');$('#msg').innerHTML=text;}
 function setStatusNow(){
@@ -332,11 +337,14 @@ function bindGate(){document.querySelectorAll('[data-approve]').forEach(b=>b.onc
 function approve(){ if(R.waiting&&R.resolver){const r=R.resolver;R.resolver=null;r();} }
 function advance(){ if(R.view!=='run')return; if(R.waiting) approve(); else if(STEPS[R.idx]!=='DONE') R.skip=true; }
 /* ---------------- OUTPUT CARDS ---------------- */
+const esc=t=>String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const lbA=(src,cap,tile)=>`data-lb="${esc(src)}" data-cap="${esc(cap||'')}"${tile?' data-tile="1"':''} role="button" tabindex="0" aria-label="${esc(L('بزرگ‌نمایی','Enlarge'))}"`;
 const ilu=()=>`<span class="illu">⚠️ ${L('نمونه‌ی نمایشی','Illustrative')}</span>`;
 const hdr=(id,t,extra)=>`<div class="oh"><span class="aid">${id}</span><h3>${t}</h3>${extra!=null?extra:ilu()}</div>`;
 const tierTag=t=>`<span class="tag ${t.toLowerCase()}">${t}</span>`;
 const decTag=d=>`<span class="dec ${d}">${d==='produce'?L('تولید کن','Produce'):d==='limited'?L('تولید محدود آزمایشی','Limited test batch'):L('تولید نکن','Do not produce')}</span>`;
-function card(k,anim){
+function card(k,anim){ return card0(k,anim).replace('<div class="oc','<div data-k="'+k+'" class="oc'); }
+function card0(k,anim){
   const s=smp(); const a=anim?'':' style="animation:none"';
   if(k[0]==='G') return gateCard(k,a);
   if(k==='DONE') return doneCard(a);
@@ -347,9 +355,9 @@ function card(k,anim){
     ${s.passport.map(r=>`<tr><td><b>${tx(r.a)}</b></td><td>${tx(r.v)}</td><td>${tierTag(r.t)}</td><td>${tx(r.m)}</td><td>${r.lab?`<span class="tag lab">🧪 ${L('تست آزمایشگاه لازم است','Requires lab test')}</span><div class="mono" style="font-size:14px;color:var(--dim);margin-top:4px">${r.lab}</div>`:'—'}</td></tr>`).join('')}</tbody></table></div>`;
   if(k==='A2') return `<div class="oc"${a}>${hdr('A2','📈 '+L('تحلیل بازار و ترند ایران','Iran market & trend brief'))}<ul>${s.market[S.lang].map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
   if(k==='A3') return `<div class="oc"${a}>${hdr('A3','🎨 '+L('سه پیشنهاد طرح — با بررسی فیت پارچه','Three proposals — with fabric-fit check'))}
-    <div class="props">${s.proposals.map(p=>`<div class="prop ${p.dec==='no'?'rej':''}"><img src="${p.img}" alt="">${p.dec==='no'?`<div class="stamp">✕ ${L('رد شد','REJECTED')}</div>`:''}<div class="pb"><b><span class="ltr">${p.id}</span> · ${tx(p.name)}</b><span>${tx(p.fit)}</span>${p.why?`<div class="why">${tx(p.why)}</div>`:''}</div></div>`).join('')}</div>
-    <div class="visrow"><div class="vis"><img src="${s.render}" alt="" style="object-position:top"><div class="cap">📸 ${L('رندر روی مدل — پیشنهاد P1','On-model render — proposal P1')}</div></div>
-    ${s.repeat?`<div class="vis tile" style="background-image:url('${s.repeat}')"><div class="cap">🔁 ${L('طرح تکرارشونده‌ی بی‌درز (Half-drop، بدون جهت)','Seamless repeat (half-drop, non-directional)')}</div></div>`:`<div class="vis"><img src="${s.swatch}" alt=""><div class="cap">🧵 ${L('مرجع بافت پارچه برای رندر','Fabric texture reference for rendering')}</div></div>`}</div></div>`;
+    <div class="props">${s.proposals.map(p=>`<div class="prop ${p.dec==='no'?'rej':''}"><img src="${p.img}" alt="" ${lbA(p.img,p.id+' · '+tx(p.name))}>${p.dec==='no'?`<div class="stamp">✕ ${L('رد شد','REJECTED')}</div>`:''}<div class="pb"><b><span class="ltr">${p.id}</span> · ${tx(p.name)}</b><span>${tx(p.fit)}</span>${p.why?`<div class="why">${tx(p.why)}</div>`:''}</div></div>`).join('')}</div>
+    <div class="visrow"><div class="vis"><img src="${s.render}" alt="" style="object-position:top" ${lbA(s.render,s.renderCap?tx(s.renderCap):L('رندر روی مدل — P1','On-model render — P1'))}><div class="cap">📸 ${s.renderCap?tx(s.renderCap):L('رندر روی مدل — پیشنهاد P1','On-model render — proposal P1')}</div></div>
+    ${s.repeat?`<div class="vis tile" style="background-image:url('${s.repeat}')" ${lbA(s.repeat,s.repeatCap?tx(s.repeatCap):L('طرح تکرارشونده‌ی بی‌درز','Seamless repeat'),1)}><div class="cap">🔁 ${s.repeatCap?tx(s.repeatCap):L('طرح تکرارشونده‌ی بی‌درز (Half-drop، بدون جهت)','Seamless repeat (half-drop, non-directional)')}</div></div>`:`<div class="vis"><img src="${s.swatch}" alt="" ${lbA(s.swatch,tx(s.name))}><div class="cap">🧵 ${L('مرجع بافت پارچه برای رندر','Fabric texture reference for rendering')}</div></div>`}</div></div>`;
   if(k==='A4'){ const r=s.roll, av=r.len-r.reserve;
     return `<div class="oc"${a}>${hdr('A4','📐 '+L('تک‌پک، مصرف و مارکر','Tech pack, consumption & marker'))}
     <div class="grid g2"><div><table class="tb"><tbody>
@@ -361,11 +369,11 @@ function card(k,anim){
       ${s.proposals.filter(p=>p.dec!=='no').map(p=>`<tr><td><span class="ltr">${p.id}</span> · ${tx(p.name)}</td><td><b>${fmt(p.cons,2)} m</b></td></tr>`).join('')}</tbody></table>
       <ul style="margin-top:12px">${s.marker[S.lang].map(x=>`<li>${x}</li>`).join('')}</ul></div></div></div>`;}
   if(k==='A5'){ const r=s.roll, av=r.len-r.reserve; const ps=s.proposals.filter(p=>p.dec!=='no'); const used=ps.reduce((t,p)=>t+p.units*p.cons,0); const res=av-used;
-    const col=['#22d3ee','#a78bfa'];
+    const col=['#22d3ee','#a78bfa','#34d399'];
     return `<div class="oc"${a}>${hdr('A5','⚖️ '+L('تصمیم تولید','Production decision'))}
     <table class="tb"><thead><tr><th>${L('پیشنهاد','Proposal')}</th><th>${L('تصمیم','Decision')}</th><th>${L('تعداد','Units')}</th><th>${L('پارچه','Fabric')}</th><th>${L('سایزبندی','Size curve')}</th></tr></thead><tbody>
     ${s.proposals.map(p=>`<tr><td><span class="ltr">${p.id}</span> · ${tx(p.name)}</td><td>${decTag(p.dec)}</td><td><b>${N(p.units)}</b></td><td>${p.units?fmt(p.units*p.cons)+' m':'—'}</td><td>${p.sizes?`<div class="sizes">${Object.entries(p.sizes).map(([z,q])=>`<span>${z}: ${q}</span>`).join('')}</div>`:'—'}</td></tr>`).join('')}</tbody></table>
-    <div class="rollbar">${ps.map((p,i)=>`<div style="flex:${(p.units*p.cons).toFixed(2)} 1 0;background:${col[i]}">${p.id} · ${(p.units*p.cons).toFixed(1)} m</div>`).join('')}<div style="flex:${r.reserve} 1 0;background:#f5c46b">${L('Reserve','Reserve')} ${r.reserve} m</div><div style="flex:${Math.max(res,.6).toFixed(2)} 1 0;background:#5d6480;color:#fff">${res.toFixed(1)}</div></div>
+    <div class="rollbar">${ps.map((p,i)=>`<div style="flex:${(p.units*p.cons).toFixed(2)} 1 0;background:${col[i]}">${p.id} · ${(p.units*p.cons).toFixed(1)} m</div>`).join('')}<div style="flex:${r.reserve} 1 0;background:#f5c46b">${L('رزرو','Reserve')} ${fmt(r.reserve)} m</div><div style="flex:${Math.max(res,.6).toFixed(2)} 1 0;background:#5d6480;color:#fff">${res.toFixed(1)}</div></div>
     <div class="legend"><span>${L('رول','Roll')} ${N(r.len)} m = ${ps.map(p=>`<span class="ltr">${p.id}</span> ${fmt(p.units*p.cons)}`).join(' + ')} + ${L('رزرو','reserve')} ${fmt(r.reserve)} + ${L('باقی‌مانده برای اکسسوری','residual for accessories')} ${fmt(res)} m</span></div>
     <div class="card" style="margin-top:16px;border-color:rgba(251,113,133,.45);background:rgba(251,113,133,.06);padding:18px 24px"><h3 style="font-size:21px;color:#fda4af">🚫 ${L('فهرست «تولید نکن»','Do-not-produce list')}</h3><ul>${s.dnp[S.lang].map(x=>`<li>${x}</li>`).join('')}</ul></div></div>`;}
   if(k==='A7') return `<div class="oc"${a}>${hdr('A7','🏭 '+L('فایل آماده‌ی ماشین','Machine-ready file'))}
@@ -373,7 +381,7 @@ function card(k,anim){
     <ul>${s.machine.checks[S.lang].map(x=>`<li>${x}</li>`).join('')}</ul>
     <p style="margin-top:10px;color:var(--gold)">🛑 ${L('فایل منتظر آزادسازی در G4 است؛ هیچ ارسال خودکاری به ماشین انجام نمی‌شود.','File is held for release at G4; nothing is auto-sent to a machine.')}</p></div>`;
   if(k==='A6') return `<div class="oc"${a}>${hdr('A6','📱 '+L('محتوای اینستاگرام فارسی','Persian Instagram content'))}
-    <div class="ig"><div class="igpost"><div class="ih"><i></i>your.brand</div><img src="${s.render}" alt="" style="object-position:top"><div class="icons">♡ 💬 ↗</div><div class="ct">${s.caption.fa}</div></div>
+    <div class="ig"><div class="igpost"><div class="ih"><i></i>your.brand</div><img src="${s.render}" alt="" style="object-position:top" ${lbA(s.render,L('پست اینستاگرام','Instagram post'))}><div class="icons">♡ 💬 ↗</div><div class="ct">${s.caption.fa}</div></div>
     <div>${S.lang==='en'?`<p style="color:var(--tx);font-weight:700;margin-bottom:8px">English translation</p><div class="card" style="padding:18px 22px;white-space:pre-line;font-size:18px;line-height:1.8">${s.caption.en}</div>`:''}
      <div class="card" style="margin-top:14px;border-color:rgba(139,92,246,.5);padding:18px 22px"><h3 style="font-size:21px">🎯 ${L('انضباط ادعا','Claim discipline')}</h3><p>${tx(s.claim)}</p></div></div></div></div>`;
   if(k==='A8') return `<div class="oc"${a}>${hdr('A8','👁️ '+L('کنترل کیفیت بصری','Vision QC'))}<p>${tx(s.qc)}</p></div>`;
@@ -383,10 +391,10 @@ function inCard(a){
   const s=smp();
   const live=`<div class="livenote" style="margin:14px 0 0">🤖 ${L('تحلیل زنده در دستیار انجام می‌شود — این عکس را در چت برای دستیار بفرستید.','Live analysis runs in the assistant — send this photo to the assistant in chat.')}</div>`;
   return `<div class="oc"${a}><div class="oh"><span class="aid">IN</span><h3>📷 ${L('ورودی: عکس رول پارچه','Input: fabric roll photo')}</h3></div>
-   <div style="display:grid;grid-template-columns:440px 1fr;gap:26px;align-items:start"><img src="${s.swatch}" alt="" style="width:100%;height:300px;object-fit:${s.upload?'contain':'cover'};border-radius:18px;background:#000;display:block">
+   <div style="display:grid;grid-template-columns:440px 1fr;gap:26px;align-items:start"><img src="${s.swatch}" alt="" ${lbA(s.swatch,tx(s.name))} style="width:100%;height:300px;object-fit:${s.upload?'contain':'cover'};border-radius:18px;background:#000;display:block">
    <div><table class="tb"><tbody>
     <tr><td>${L('پارچه','Fabric')}</td><td><b>${tx(s.name)}</b></td></tr>
-    <tr><td>${L('رول','Roll')}</td><td><b>${L('۴۵ متر × ۱۵۰ سانتی‌متر','45 m × 150 cm')}</b></td></tr>
+    <tr><td>${L('رول','Roll')}</td><td><b>${s.roll?L(`${N(s.roll.len)} متر × ${N(s.roll.width)} سانتی‌متر`,`${s.roll.len} m × ${s.roll.width} cm`):'—'}</b></td></tr>
     <tr><td>${L('هدف','Goal')}</td><td>${L('بهترین استفاده از این رول: چه بسازیم، چندتا، و چه نسازیم','Best use of this roll: what to make, how many, and what not to make')}</td></tr>
     <tr><td>${L('مخاطب','User')}</td><td>${L('تولیدکننده‌ی پوشاک','Apparel manufacturer')}</td></tr></tbody></table>${s.upload?live:''}</div></div></div>`;
 }
@@ -410,7 +418,7 @@ function upCard(k,a){
   const what={A1:L('شناسنامه‌ی پارچه: ساختار، جنس احتمالی، گرماژ، کشسانی، آبرفتگی، ریزش — هرکدام با T1–T4 و ارجاع آزمایشگاهی.','Passport: construction, likely fibre, mass, stretch, shrinkage, drape — each with T1–T4 and lab escalation.'),
     A2:L('سیگنال‌های بازار فارسی و جهت تقاضا برای این پارچه.','Persian market signals and demand direction for this fabric.'),
     A3:L('سه پیشنهاد لباس با اسکچ، یکی ردشده با دلیل، و رندر روی مدل.','Three garment proposals with sketches, one rejected with a reason, and an on-model render.'),
-    A4:L('مصرف پارچه برای هر مدل و نکات مارکر برای رول ۴۵ × ۱۵۰.','Consumption per style and marker notes for a 45 × 150 roll.'),
+    A4:L('مصرف پارچه برای هر مدل و نکات مارکر بر اساس طول و عرض رول.','Consumption per style and marker notes based on roll length and width.'),
     A5:L('تعداد به تفکیک سایز و فهرست «تولید نکن».','Size-level quantities and the do-not-produce list.'),
     A7:L('TIFF برای RIP یا DXF-AAMA برای CAD الگو.','TIFF for the RIP or DXF-AAMA for pattern CAD.'),
     A6:L('کپشن فارسی اینستاگرام با انضباط ادعا.','Persian Instagram caption with claim discipline.'),
@@ -418,29 +426,82 @@ function upCard(k,a){
   return `<div class="oc"${a}>${hdr(k,ag.ic+' '+tx(ag.n),`<span class="illu" style="border-color:rgba(34,211,238,.6);color:#a5f3fc">LIVE · ${L('در دستیار','in the assistant')}</span>`)}${k==='A1'?live:''}<div class="ph">${what}</div></div>`;
 }
 /* ---------------- CHROME / LANG / KEYS ---------------- */
+const isStandalone=()=>{try{return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||(window.matchMedia&&matchMedia('(display-mode: fullscreen)').matches)||navigator.standalone===true;}catch(e){return false;}};
+const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement||null;
+const fsOK=()=>!!(document.fullscreenEnabled||document.webkitFullscreenEnabled);
+S.cached=false;
 function applyLang(){
-  document.documentElement.lang=S.lang; document.documentElement.dir=S.lang==='fa'?'rtl':'ltr';
+  const rtl=S.lang==='fa';
+  document.documentElement.lang=S.lang; document.documentElement.dir=rtl?'rtl':'ltr';
   try{localStorage.setItem('r2r_lang',S.lang);}catch(e){}
-  $('#lfa').classList.toggle('on',S.lang==='fa'); $('#len').classList.toggle('on',S.lang==='en');
+  $('#lfa').classList.toggle('on',rtl); $('#len').classList.toggle('on',!rtl);
   $('#brandSub').textContent=L('رول تا تولید · همایش ملی نساجی و پوشاک','Roll-to-Run · NCTAF4');
   $('#btnSlides').textContent=L('اسلایدها','Slides'); $('#btnDemo').textContent=L('دموی زنده','Live demo');
+  $('#btnLite').textContent=L('سبک','Lite'); $('#btnLite').title=L('حالت سبک: خاموش کردن افکت‌های سنگین','Lite mode: turn off heavy effects');
+  $('#btnFS').title=L('تمام‌صفحه','Fullscreen'); $('#btnHelp').title=L('راهنما','Help');
+  $('#bPrev').textContent=rtl?'→':'←'; $('#bNext').textContent=rtl?'←':'→';
+  $('#bPrev').title=L('اسلاید قبلی','Previous slide'); $('#bNext').title=L('اسلاید بعدی','Next slide');
   $('#foot').textContent=L('امین بختیاری · NCTAF4 · ۱۸ آذر ۱۴۰۵','Amin Bakhtiari · NCTAF4 · 9 Dec 2026');
+  $('#rot').textContent=L('📱 برای نمایش بهتر، دستگاه را افقی بچرخانید','📱 Rotate to landscape for the best view');
+  $('#lbX').title=L('بستن','Close'); $('#lbPrev').textContent=rtl?'›':'‹'; $('#lbNext').textContent=rtl?'‹':'›';
   updNet(); renderHelp(); renderSlides();
   if(S.mode==='demo'){ if(R.view==='pick') renderPick(); else renderRun(); }
-  updChrome();
+  updChrome(); updFS(); if(LB.open) lbShow();
 }
 function setLang(l){ if(S.lang===l)return; S.lang=l; applyLang(); }
 function updNet(){
   const on=navigator.onLine;
-  $('#net').innerHTML=`<span class="dot"></span>${L('آفلاین · ۱۰۰٪ محلی','Offline-ready · 100% local')}<span style="color:var(--dim)">· ${on?L('اینترنت: وصل','net: online'):L('اینترنت: قطع','net: offline')}</span>`;
+  const c=location.protocol==='file:'?L('فایل محلی','local file'):(S.cached?L('ذخیره برای آفلاین ✓','saved for offline ✓'):L('در حال ذخیره برای آفلاین…','caching for offline…'));
+  $('#net').innerHTML=`<span class="dot"></span>${L('آماده‌ی کار آفلاین','Offline-ready')}<span style="color:var(--dim)">· ${c} · ${on?L('اینترنت: وصل','net: online'):L('اینترنت: قطع','net: offline')}</span>`;
 }
 function renderHelp(){
-  const rows=[['PageDown / Space / ↓',L('بعدی (در دمو: ادامه / تأیید)','Next (demo: advance / approve)')],['PageUp / ↑',L('قبلی','Previous')],[S.lang==='fa'?'← / →':'→ / ←',L('بعدی / قبلی (جهت با زبان عوض می‌شود)','Next / previous (direction follows language)')],['D',L('دموی زنده','Live demo')],['Esc / S',L('بازگشت','Back')],['1 2 3 4',L('انتخاب نمونه در دمو','Pick a sample in the demo')],['L',L('تغییر زبان فارسی / English','Toggle FA / EN')],['F',L('تمام‌صفحه','Fullscreen')],['Home / End',L('اولین / آخرین اسلاید','First / last slide')],['?',L('راهنما','Help')]];
-  $('#help').innerHTML=`<div class="card"><h3>⌨️ ${L('کلیدهای میان‌بر','Keyboard shortcuts')}</h3><table>${rows.map(r=>`<tr><td><kbd>${r[0]}</kbd></td><td>${r[1]}</td></tr>`).join('')}</table><p style="margin-top:16px;font-size:17px">${L('برای بستن هر کلیدی را بزنید.','Press any key to close.')}</p></div>`;
+  const touch=L('روی آیپد: برای اسلاید بعدی/قبلی انگشت را به چپ/راست بکشید یا دکمه‌های پایین صفحه را بزنید. روی هر تصویر بزنید تا بزرگ شود.','On iPad: swipe left/right or use the arrows at the bottom to change slides. Tap any image to enlarge it.');
+  const rows=[['PageDown / Space / ↓',L('بعدی (در دمو: ادامه / تأیید)','Next (demo: advance / approve)')],['PageUp / ↑',L('قبلی (در دمو: انتخاب پارچه)','Previous (demo: back to fabrics)')],[S.lang==='fa'?'← / →':'→ / ←',L('بعدی / قبلی (جهت با زبان عوض می‌شود)','Next / previous (direction follows language)')],['D',L('دموی زنده','Live demo')],['Esc / S',L('بازگشت','Back')],['1 … 9 · U',L('انتخاب پارچه در دمو · U = آپلود عکس','Pick a fabric in the demo · U = upload a photo')],['L',L('تغییر زبان فارسی / English','Toggle FA / EN')],['F',L('تمام‌صفحه','Fullscreen')],['Home / End',L('اولین / آخرین اسلاید','First / last slide')],['?',L('راهنما','Help')]];
+  $('#help').innerHTML=`<div class="card"><button class="hx" aria-label="close">✕</button><h3>⌨️ ${L('راهنما و کلیدها','Help & shortcuts')}</h3><p style="margin-bottom:12px">👆 ${touch}</p><table>${rows.map(r=>`<tr><td><kbd>${r[0]}</kbd></td><td>${r[1]}</td></tr>`).join('')}</table><p style="margin-top:16px;font-size:17px">${L('برای بستن، هر جا بزنید یا هر کلیدی را فشار دهید.','Tap anywhere or press any key to close.')}</p></div>`;
 }
-function fit(){const sc=Math.min(window.innerWidth/1920,window.innerHeight/1080);$('#stage').style.transform=`scale(${sc})`;}
-function toggleFS(){ try{ if(!document.fullscreenElement){const p=document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); if(p&&p.catch)p.catch(()=>{});} else if(document.exitFullscreen) document.exitFullscreen(); }catch(e){} }
+function fit(){const w=window.innerWidth,h=window.innerHeight;const sc=Math.min(w/1920,h/1080);$('#stage').style.transform=`scale(${sc})`;S.scale=sc;
+  /* keep every chrome tap target >=44 CSS px even when the stage is scaled down (iPad portrait) */
+  document.documentElement.style.setProperty('--hit',Math.max(16,Math.ceil((46/sc-54)/2))+'px');}
+function toast(msg,ms){const t=$('#toast');t.innerHTML=msg;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),ms||4200);}
+function updFS(){
+  const b=$('#btnFS'); if(!b) return;
+  b.style.display=isStandalone()?'none':'';
+  b.textContent=fsEl()?'🗗':'⛶';
+}
+function toggleFS(){
+  try{
+    if(fsEl()){ (document.exitFullscreen||document.webkitExitFullscreen).call(document); return; }
+    const el=document.documentElement; const rq=el.requestFullscreen||el.webkitRequestFullscreen;
+    if(!rq||!fsOK()){ toast(L('این مرورگر تمام‌صفحه را پشتیبانی نمی‌کند. روی آیپد: Safari ← Share ← Add to Home Screen و از آیکون صفحه‌ی اصلی باز کنید.','This browser has no fullscreen API. On iPad: Safari → Share → Add to Home Screen, then open from the icon.'),6500); return; }
+    const p=rq.call(el); if(p&&p.catch)p.catch(()=>toast(L('تمام‌صفحه انجام نشد.','Fullscreen was blocked.')));
+  }catch(e){ toast(L('تمام‌صفحه انجام نشد.','Fullscreen was blocked.')); }
+}
+function setLite(on,save){ document.documentElement.classList.toggle('lite',on); $('#btnLite').classList.toggle('hot',on); if(save){try{localStorage.setItem('r2r_lite',on?'1':'0');}catch(e){}} }
 
+/* ---------------- LIGHTBOX ---------------- */
+const LB={open:false,items:[],i:0,wasPaused:false};
+function lbOpen(el){
+  const scope=el.closest('.oc')||el.closest('.rail')||el.closest('.samples')||document;
+  const items=[...scope.querySelectorAll('[data-lb]')]; const seen=new Set(); LB.items=[];
+  items.forEach(x=>{const k=x.dataset.lb+'|'+x.dataset.tile; if(seen.has(k))return; seen.add(k); LB.items.push({src:x.dataset.lb,cap:x.dataset.cap||'',tile:!!x.dataset.tile});});
+  LB.i=Math.max(0,LB.items.findIndex(it=>it.src===el.dataset.lb&&it.tile===!!el.dataset.tile));
+  LB.open=true; LB.wasPaused=R.paused; R.paused=true;
+  $('#lb').classList.add('on'); $('#lb').setAttribute('aria-hidden','false'); lbShow();
+}
+function lbShow(){
+  const it=LB.items[LB.i]; if(!it) return;
+  const im=$('#lbImg'), tl=$('#lbTile');
+  if(it.tile){ im.style.display='none'; tl.style.display='block'; tl.style.backgroundImage=`url("${it.src}")`; }
+  else { tl.style.display='none'; im.style.display='block'; im.src=it.src; }
+  $('#lbCap').textContent=it.cap; const n=LB.items.length;
+  $('#lbCount').textContent=n>1?`${N(LB.i+1)} / ${N(n)}`:'';
+  $('#lbPrev').style.visibility=n>1?'visible':'hidden'; $('#lbNext').style.visibility=n>1?'visible':'hidden';
+}
+function lbStep(d){ const n=LB.items.length; if(n<2) return; LB.i=(LB.i+d+n)%n; lbShow(); }
+function lbClose(){ if(!LB.open) return; LB.open=false; $('#lb').classList.remove('on'); $('#lb').setAttribute('aria-hidden','true'); R.paused=LB.wasPaused; const b=$('#bPause'); if(b) b.textContent=R.paused?'▶':'⏸'; }
+document.addEventListener('click',e=>{ const t=e.target.closest&&e.target.closest('[data-lb]'); if(t&&!LB.open){ e.preventDefault(); e.stopPropagation(); lbOpen(t); } },true);
+
+/* ---------------- KEYS ---------------- */
 document.addEventListener('keydown',e=>{
   const h=$('#help'); if(h.classList.contains('on')){h.classList.remove('on');e.preventDefault();return;}
   if(e.ctrlKey||e.metaKey||e.altKey) return;
@@ -451,6 +512,9 @@ document.addEventListener('keydown',e=>{
   else if(k==='PageUp'||k==='ArrowUp') dir=-1;
   else if(k==='ArrowLeft') dir=rtl?1:-1;
   else if(k==='ArrowRight') dir=rtl?-1:1;
+  if(LB.open){ e.preventDefault(); if(k==='Escape'||k==='Enter') lbClose(); else if(dir) lbStep(dir); return; }
+  const fe=e.target&&e.target.closest&&e.target.closest('[data-lb]');
+  if(fe&&(k==='Enter')){ e.preventDefault(); lbOpen(fe); return; }
   if(k==='?'){h.classList.add('on');e.preventDefault();return;}
   if(k==='l'||k==='L'){setLang(S.lang==='fa'?'en':'fa');return;}
   if(k==='f'||k==='F'){toggleFS();return;}
@@ -462,8 +526,8 @@ document.addEventListener('keydown',e=>{
   } else {
     if(k==='Escape'||k==='s'||k==='S'){ if(R.view==='run'&&k==='Escape') renderPick(); else closeDemo(); return; }
     if(R.view==='pick'){
-      if(k==='1'||k==='2'||k==='3'){startRun(window.R2R_SAMPLES['f'+k]);return;}
-      if(k==='4'){$('#file').click();return;}
+      if(/^[1-9]$/.test(k)){const id=SKEYS()[+k-1]; if(id){startRun(window.R2R_SAMPLES[id]);return;}}
+      if(k==='u'||k==='U'||k==='0'){$('#file').click();return;}
       if(dir===1){e.preventDefault();closeDemo();go(S.slide+1);return;}
       if(dir===-1){e.preventDefault();closeDemo();return;}
     } else {
@@ -472,16 +536,45 @@ document.addEventListener('keydown',e=>{
     }
   }
 });
-window.addEventListener('resize',fit); window.addEventListener('online',updNet); window.addEventListener('offline',updNet);
+
+/* ---------------- TOUCH ---------------- */
+function swipe(el,cb){
+  let x0=0,y0=0,t0=0,ok=false;
+  el.addEventListener('touchstart',e=>{ if(e.touches.length!==1){ok=false;return;} const t=e.touches[0]; x0=t.clientX; y0=t.clientY; t0=Date.now(); ok=true; },{passive:true});
+  el.addEventListener('touchend',e=>{ if(!ok) return; ok=false; const t=e.changedTouches[0]; const dx=t.clientX-x0, dy=t.clientY-y0;
+    if(Date.now()-t0<800 && Math.abs(dx)>50 && Math.abs(dx)>1.5*Math.abs(dy)) cb(dx,e); },{passive:true});
+}
+function swipeDir(dx){ const rtl=S.lang==='fa'; return dx<0 ? (rtl?-1:1) : (rtl?1:-1); } /* LTR: swipe left = next; RTL: swipe right = next */
+
+window.addEventListener('resize',()=>{fit();updFS();}); window.addEventListener('orientationchange',()=>setTimeout(fit,250));
+if(window.visualViewport) visualViewport.addEventListener('resize',fit);
+window.addEventListener('online',updNet); window.addEventListener('offline',updNet);
+document.addEventListener('fullscreenchange',updFS); document.addEventListener('webkitfullscreenchange',updFS);
+
 function init(){
   $('#lfa').onclick=()=>setLang('fa'); $('#len').onclick=()=>setLang('en');
-  $('#btnSlides').onclick=()=>{ if(S.mode==='demo') closeDemo(); };
+  $('#btnSlides').onclick=()=>{ if(S.mode==='demo') closeDemo(); else go(S.slide); };
   $('#btnDemo').onclick=()=>openDemo();
   $('#btnHelp').onclick=()=>$('#help').classList.add('on');
   $('#btnFS').onclick=toggleFS;
+  $('#btnLite').onclick=()=>setLite(!document.documentElement.classList.contains('lite'),true);
+  $('#bPrev').onclick=()=>go(S.slide-1); $('#bNext').onclick=()=>go(S.slide+1);
   $('#help').onclick=()=>$('#help').classList.remove('on');
+  $('#lbX').onclick=lbClose; $('#lbPrev').onclick=e=>{e.stopPropagation();lbStep(-1);}; $('#lbNext').onclick=e=>{e.stopPropagation();lbStep(1);};
+  $('#lb').addEventListener('click',e=>{ if(e.target.closest('#lbPrev,#lbNext,#lbImg,#lbTile')) return; lbClose(); });
+  swipe($('#lb'),dx=>lbStep(swipeDir(dx)));
+  swipe($('#viewport'),(dx,e)=>{ if(LB.open||S.mode!=='slides') return; go(S.slide+swipeDir(dx)); });
+  let lite=null; try{lite=localStorage.getItem('r2r_lite');}catch(e){}
+  const rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  setLite(lite==='1'||(lite===null&&rm),false);
   fit(); applyLang();
-  window.R2R={go,openDemo,closeDemo,startRun,advance,approve,setLang,state:S,run:R,samples:window.R2R_SAMPLES};
+  if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+    navigator.serviceWorker.register('sw.js',{scope:'./'}).then(()=>navigator.serviceWorker.ready).then(()=>{
+      const chk=()=>caches.open(window.R2R_CACHE).then(c=>c.match('index.html')).then(r=>{ if(r){S.cached=true;updNet();} else setTimeout(chk,1500); });
+      chk();
+    }).catch(()=>{});
+  }
+  window.R2R={go,openDemo,closeDemo,startRun,advance,approve,setLang,setLite,lbClose,state:S,run:R,lb:LB,samples:window.R2R_SAMPLES};
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
