@@ -177,8 +177,8 @@ SL.push(() => `<div class="slide hero" style="align-items:center;text-align:cent
   <div class="big gt" style="font-size:150px">${L('اجرا','RUN')}</div>
   <div class="sub">${L('یک رول پارچه — چند دقیقه — تصمیم تولید','One roll — a few minutes — a production decision')}</div>
   <p class="lead" style="margin:0 auto 40px">${L('نُه پارچه‌ی نمونه — از ساتن و مخمل تا ژاکارد — یا عکس پارچه‌ی خود شما.','Nine sample fabrics — from satin and velvet to jacquard — or a photo of your own fabric.')}</p>
-  <div><button class="approve" data-act="demo" style="height:76px;font-size:28px;padding:0 50px">▶ ${L('شروع دمو','Start demo')}</button></div>
-  <div class="note" style="margin-top:40px">${L('کلید D یا Enter','Press D or Enter')}</div></div>`);
+  <div><button class="approve" data-act="demo" style="height:76px;font-size:28px;padding:0 50px">▶ ${L('شروع دمو','Start demo')}</button><button class="approve millbtn" data-act="mill" style="height:76px;font-size:28px;padding:0 44px;margin-inline-start:22px">🏭 ${L('حالت کارخانه نساجی','Mill mode')}</button></div>
+  <div class="note" style="margin-top:40px">${L('کلید D یا Enter · کلید M = حالت کارخانه','Press D or Enter · M = Mill mode')}</div></div>`);
 SL.push(() => `<div class="slide hero" style="align-items:center;text-align:center">
   <div class="big gt" style="font-size:130px">${L('پرسش؟','Questions?')}</div>
   <div class="sub">${L('سؤال فنی‌تان را بپرسید — ایجنت پاسخ می‌دهد.','Ask your technical question — the agent answers.')}</div>
@@ -218,11 +218,57 @@ function archShow(i){
 function archStart(){ archStop(); archShow(archI); archTimer=setInterval(()=>{ if(Date.now()<archHold) return; archShow((archI+1)%8); }, 3200); }
 function archStop(){ if(archTimer){clearInterval(archTimer);archTimer=null;} }
 
+/* ---- added slides (mill mode): inserted without removing any existing slide ---- */
+const S_NEED=() => `<div class="slide">${head(L('نیاز کارخانه‌ها','What mills need'), L('کارخانه‌ی نساجی چه می‌خواهد بداند؟','What does a textile mill need to know?'))}
+  <div class="grid g4" style="margin-bottom:26px">
+   ${[['📡',L('الان چه می‌فروشد؟','What sells right now?'),L('کدام طرح، رنگ، الیاف، گرماژ و عرض در بازار پوشاک و فروشگاه‌های آنلاین ایران رو به رشد است.','Which designs, colours, fibres, weights and widths are rising in Iran’s apparel market and online shops.')],
+      ['⚖️',L('چه ببافیم، چه نبافیم؟','What to weave — and not?'),L('سبد محصول در برابر بازار و موجودی: بیشتر، کمتر یا توقف — پیش از آنکه رول راکد شود.','Portfolio vs market and stock: more, less or stop — before rolls go dead.')],
+      ['🧊',L('انبار راکد','Dead stock'),L('رول‌های فروش‌نرفته را به تولیدی مناسب برسانیم، نه به حراج.','Route unsold rolls to the right apparel maker, not a fire sale.')],
+      ['👁️',L('کیفیت و شید','Quality & shade'),L('عیب را پیش از خریدار پیدا کنیم و شید لات‌ها را یکدست نگه داریم.','Find defects before the buyer does and keep lot shades consistent.')]].map(c=>`<div class="card"><h3><span class="ic">${c[0]}</span><span>${c[1]}</span></h3><p>${c[2]}</p></div>`).join('')}
+  </div>
+  <div class="grid g3">
+    <div class="card glow"><div class="stat gt ltr">~70%</div><p>${L('از عیب‌های پارچه با بازرسی چشمی پیدا می‌شود — حتی با بازرسان آموزش‌دیده.','of fabric defects are found by manual inspection — even with highly trained inspectors.')}</p><div class="src">Kumar &amp; Pang, IEEE Trans. SMC-B, 2002</div></div>
+    <div class="card glow"><div class="stat gt ltr">45–65%</div><p>${L('قیمت پارچه‌ی درجه‌ی دو نسبت به درجه‌ی یک؛ هر عیب کشف‌نشده مستقیماً از سود کم می‌کند.','is the price of second-quality fabric vs first quality; every missed defect cuts margin.')}</p><div class="src">Chan &amp; Pang, 2000 · cited in Brenzovich, NCSU 2003</div></div>
+    <div class="card glow"><div class="stat gt ltr">&lt;1%</div><p>${L('از مواد مصرفی پوشاک دوباره به پوشاک تبدیل می‌شود؛ تولید بیش از تقاضا یعنی ضایعه‌ی دائمی.','of clothing material is recycled into new clothing — overproduction is a permanent loss.')}</p><div class="src">Ellen MacArthur Foundation, A New Textiles Economy, 2017</div></div>
+  </div>
+  <p class="note" style="margin-top:18px">💬 ${L('از گفت‌وگو با مدیران کارخانه‌های نساجی: «می‌خواهیم بدانیم کدام طرح، جنس و الیاف الان فروش دارد.»','From conversations with textile mill managers: “We want to know which designs, materials and fibres are selling now.”')}</p></div>`;
+const S_DDI=() => `<div class="slide">${head(L('پیوست · اختیاری — ماژول جدید','Appendix · optional — new module'), L('هوش تقاضا و طراحی برای کارخانه','Demand & Design Intelligence for mills'))}
+  <div class="mflow">
+   ${[['🛒',L('منابع','Sources'),L('فروشگاه‌های آنلاین، آگهی‌های بازار، سفارش عمده‌فروشان، فروش ERP کارخانه','Online shops, marketplace listings, wholesaler orders, the mill’s ERP sales')],
+      ['📡',L('M1 نبض بازار','M1 Market Pulse'),L('طرح · رنگ · الیاف · گرماژ · عرض — هرکدام با روند و سطح اطمینان T1–T4','Design · colour · fibre · weight · width — each with a trend and a T1–T4 tier')],
+      ['📦',L('M2 سبد و موجودی','M2 Portfolio & stock'),L('ماه‌های پوشش موجودی برای هر کالا','Months of stock cover per article')],
+      ['⚖️',L('M3 تصمیم','M3 Decision'),L('بیشتر / کمتر / توقف + رنگ‌بندی مولد فصل بعد','MORE / REDUCE / STOP + generated next-season colourways')],
+      ['🧊',L('M4 انبار راکد','M4 Dead stock'),L('تطبیق B2B رول‌های فروش‌نرفته با تولیدی‌ها','B2B matching of unsold rolls to apparel makers')]].map(c=>`<div class="card mstep"><div style="font-size:50px">${c[0]}</div><h3>${c[1]}</h3><p>${c[2]}</p></div>`).join('<div class="mar">→</div>')}
+  </div>
+  <div class="grid g2" style="margin-top:26px">
+   <div class="card glow"><h3>🛡️ ${L('انسان تصمیم می‌گیرد','Humans decide')}</h3><p>${L('G1: مدیر فروش گزارش بازار را می‌پذیرد · G2: برنامه‌ریزی و طراح ارشد ترکیب تولید را امضا می‌کنند.','G1: the sales manager accepts the market brief · G2: planning and the chief designer sign the production mix.')}</p></div>
+   <div class="card"><h3>⚠️ ${L('صداقت داده','Data honesty')}</h3><p>${L('در دموی امروز، داده‌ها کاتالوگ نمونه‌ی نمایشی‌اند و نام کارخانه‌ها فرضی است؛ اتصال زنده به منابع در مرحله‌ی استقرار.','In today’s demo the data is an illustrative sample catalogue and mill names are fictional; live connectors come with deployment.')}</p></div>
+  </div></div>`;
+const S_QAI=() => `<div class="slide">${head(L('پیوست · اختیاری — ماژول جدید','Appendix · optional — new module'), L('هوش کیفیت: عیب‌یابی و تطبیق شید','Quality AI: defects & shade'))}
+  <div class="grid g2" style="flex:1;gap:30px;align-items:stretch">
+   <div class="card" style="padding:16px;display:flex;flex-direction:column"><img src="assets/img/m1_defect_boxed.jpg" alt="" ${lbA('assets/img/m1_defect_boxed.jpg',L('تشخیص عیب با کادر و سطح اطمینان — تصویر نمونه‌ی تولیدشده','Defect detection with boxes and confidence — generated sample image'))} style="width:100%;flex:1;min-height:0;object-fit:cover;border-radius:14px;cursor:zoom-in"><div class="src" style="margin-top:10px">${L('تصویر نمونه‌ی تولیدشده · نمایشی','Generated sample image · illustrative')}</div></div>
+   <div style="display:flex;flex-direction:column;gap:18px">
+    <div class="card"><h3><span class="ic">🔲</span>${L('تشخیص عیب روی میز بازرسی','Defect detection on the inspection table')}</h3><p>${L('مدل بینایی (CNN/ViT) نوار پود، نخ پاره، لکه، سوراخ و پرش را با کادر و درصد اطمینان علامت می‌زند؛ اطمینان پایین ← بازبینی انسانی.','A vision model (CNN/ViT) boxes weft bars, broken ends, stains, holes and floats with a confidence; low confidence → human review.')}</p></div>
+    <div class="card"><h3><span class="ic">🧮</span>${L('امتیازدهی خودکار ۴ نقطه‌ای','Automatic 4-point scoring')}</h3><p>${L('امتیاز در ۱۰۰ یارد مربع طبق ASTM D5430 و درجه‌بندی رول برای خریدار.','Points per 100 yd² per ASTM D5430, and roll grading for the buyer.')}</p></div>
+    <div class="card"><h3><span class="ic">🎯</span>${L('تطبیق شید لات‌ها (ΔE₀₀)','Lot shade matching (ΔE₀₀)')}</h3><p>${L('مقایسه‌ی هر لات با استاندارد با فرمول CIEDE2000؛ گروه‌بندی A/B و نگه‌داشتن لات خارج از تلرانس. اسپکتروفتومتر مرجع نهایی می‌ماند.','Each lot vs the standard with CIEDE2000; A/B shade grouping and holding out-of-tolerance lots. The spectrophotometer stays the final reference.')}</p></div>
+    <div class="card glow"><p>${L('بازرسی چشمی حتی با بازرسان آموزش‌دیده حدود ۷۰٪ عیب‌ها را پیدا می‌کند.','Manual inspection finds about 70% of defects, even with trained inspectors.')}</p><div class="src">Kumar &amp; Pang, IEEE Trans. SMC-B, 2002</div></div>
+   </div></div></div>`;
+const S_DEP=() => `<div class="slide">${head(L('توسعه‌ی آینده · مسیرهای استقرار','Future development · deployment paths'), L('سه راه استقرار — داده در کارخانه می‌ماند','Three ways to deploy — data stays in the factory'))}
+  <div class="grid g3" style="margin-bottom:24px">
+   <div class="card glow"><div style="font-size:54px">🏭</div><h3>${L('روی سرور کارخانه (On-prem)','On-prem on factory servers')}</h3><ul><li>${L('مدل‌های بینایی اختصاصی کارخانه: CNN/ViT برای عیب‌یابی و تشخیص الیاف و نوع بافت','The mill’s own vision models: CNN/ViT for defects and fibre / weave recognition')}</li><li>${L('مدل طراحی مولد اختصاصی، آموزش‌دیده روی آرشیو طرح‌های خود کارخانه','The mill’s own generative design model, trained on its design archive')}</li><li>${L('بدون اینترنت؛ داده هرگز از کارخانه خارج نمی‌شود','No internet needed; data never leaves the factory')}</li></ul></div>
+   <div class="card"><div style="font-size:54px">☁️</div><h3>${L('هوش مصنوعی متصل با API','API-connected AI')}</h3><ul><li>${L('شروع سریع بدون سخت‌افزار GPU','Fast start, no GPU hardware')}</li><li>${L('ارسال فقط داده‌ی لازم و بی‌نام‌شده، با قرارداد','Only minimal, anonymised data sent, under contract')}</li><li>${L('مناسب پایلوت و کارخانه‌های کوچک‌تر','Good for pilots and smaller mills')}</li></ul></div>
+   <div class="card"><div style="font-size:54px">🔀</div><h3>${L('ترکیبی (Hybrid)','Hybrid')}</h3><ul><li>${L('بینایی و داده‌ی حساس روی سرور کارخانه','Vision and sensitive data on factory servers')}</li><li>${L('مدل‌های عمومی از طریق API','General models via API')}</li><li>${L('مهاجرت تدریجی به On-prem کامل','Gradual migration to full on-prem')}</li></ul></div>
+  </div>
+  <div class="card" style="padding:20px 26px"><h3 style="margin-bottom:12px">🔌 ${L('یکپارچگی با خط تولید','Integration with the line')}</h3><div class="chips" style="margin:0">${['Jacquard · Stäubli JC5 / Bonas EP','Dobby · WIF','Digital RIP · TIFF/ICC','ERP','MES','OPC UA',L('دوربین میز بازرسی','Inspection cameras'),L('اسپکتروفتومتر','Spectrophotometer')].map(c=>`<span class="tag ltr">${c}</span>`).join('')}</div></div>
+  <p class="note" style="margin-top:16px">🔒 ${L('در هر سه مسیر: دروازه‌های تأیید انسانی، لاگ ممیزی و مالکیت کامل کارخانه بر داده و مدل‌ها.','In all three paths: human approval gates, an audit log, and full mill ownership of data and models.')}</p></div>`;
+/* order: … problem, [What mills need], idea … C4, [DDI], [Quality AI] … Future horizons, [Deployment paths], RUN, Questions */
+{ const iF=SL.length-2; SL.splice(iF,0,S_DEP); SL.splice(8,0,S_DDI,S_QAI); SL.splice(2,0,S_NEED); }
 /* ---------------- SLIDE NAV ---------------- */
 function renderSlides(){
   const box=$('#slides'); box.innerHTML=SL.map(f=>f()).join('');
   box.querySelectorAll('.slide').forEach((el,i)=>el.classList.toggle('on', i===S.slide));
   box.querySelectorAll('[data-act=demo]').forEach(b=>b.onclick=()=>openDemo());
+  box.querySelectorAll('[data-act=mill]').forEach(b=>b.onclick=()=>openMill());
   box.querySelectorAll('.node').forEach(n=>n.onclick=()=>{archHold=Date.now()+12000;archShow(+n.dataset.ag);});
   onSlideChange();
 }
@@ -243,7 +289,8 @@ function updChrome(){
   $('#btnSlides').classList.toggle('hot',S.mode==='slides'); $('#btnDemo').classList.toggle('hot',S.mode==='demo');
 }
 /* ---------------- DEMO ENGINE ---------------- */
-const STEPS=['A1','G1','A2','A3','G2','A4','A5','G3','A7','A6','A8','G4','DONE'];
+const ASTEPS=['A1','G1','A2','A3','G2','A4','A5','G3','A7','A6','A8','G4','DONE'];
+let STEPS=ASTEPS;
 const MSG={
  A1:{fa:['الان داره تصویر ماکرو رو بررسی می‌کنه...','الان داره ساختار بافت رو تشخیص می‌ده...','الان داره جنس پارچه رو تشخیص می‌ده...','الان داره برای هر ویژگی سطح اطمینان تعیین می‌کنه...'],en:['Reading the macro image...','Detecting the weave / knit structure...','Estimating the fibre type...','Assigning a confidence tier to every attribute...']},
  A2:{fa:['الان داره سیگنال‌های بازار فارسی رو می‌خونه...','الان داره ترندهای فصل رو با پایگاه دانش تطبیق می‌ده...','الان داره جهت تقاضا رو جمع‌بندی می‌کنه...'],en:['Reading Persian market signals...','Matching seasonal trends against the knowledge base...','Summarising demand direction...']},
@@ -254,7 +301,7 @@ const MSG={
  A6:{fa:['الان داره کپشن فارسی اینستاگرام رو می‌نویسه...','الان داره ادعاهای تبلیغ رو با شناسنامه‌ی پارچه چک می‌کنه...'],en:['Writing the Persian Instagram caption...','Checking marketing claims against the fabric passport...']},
  A8:{fa:['الان داره برنامه‌ی کنترل کیفیت بصری رو آماده می‌کنه...'],en:['Preparing the vision QC plan...']}
 };
-const R={ sample:null, idx:-1, done:[], waiting:false, gen:0, cur:null, skip:false, paused:false, t0:0, t1:0, approvals:{}, resolver:null, view:'pick' };
+const R={ pmode:'apparel', sample:null, idx:-1, done:[], waiting:false, gen:0, cur:null, skip:false, paused:false, t0:0, t1:0, approvals:{}, resolver:null, view:'pick' };
 const alive=g=>g===R.gen;
 function sleep(ms,g){return new Promise(res=>{let left=ms;const tick=()=>{if(!alive(g))return res(false);if(R.skip&&!R.waiting)return res(true);if(!R.paused)left-=50;if(left<=0)return res(true);setTimeout(tick,50);};setTimeout(tick,50);});}
 const smp=()=>R.sample;
@@ -266,23 +313,25 @@ const SKEYS=()=>Object.keys(window.R2R_SAMPLES).sort((a,b)=>+a.slice(1)-+b.slice
 const rollTxt=s=>s.roll?L(`رول ${N(s.roll.len)} متر × ${N(s.roll.width)} سانتی‌متر`,`Roll ${s.roll.len} m × ${s.roll.width} cm`):'';
 function renderPick(){
   R.view='pick'; R.gen++; R.waiting=false; R.resolver=null;
+  if(R.pmode==='mill') return renderMillPick();
   const ss=window.R2R_SAMPLES;
-  $('#demo').innerHTML=`<div class="demo-pick"><div class="kicker">${L('دموی زنده · مرحله‌ی ۱','Live demo · step 1')}</div><h1 class="t" style="margin-bottom:10px">${L('یک رول پارچه انتخاب کنید','Choose a fabric roll')}</h1>
-   <div style="display:flex;gap:18px;align-items:center"><span class="illu">⚠️ ${L('داده‌های نمونه، مثال‌های نمایشی (Illustrative) هستند، نه نتیجه‌ی اندازه‌گیری','Sample data are illustrative examples, not measured results')}</span><span style="color:var(--dim);font-size:17px">${L('کلیدهای ۱ تا ۹ · آپلود با کلید <bdi>U</bdi>','Keys 1–9 · U = upload')}</span></div>
+  $('#demo').innerHTML=`<div class="demo-pick"><div class="pickhd"><div class="kicker">${L('دموی زنده · مرحله‌ی ۱','Live demo · step 1')}</div>${modeSw()}</div><h1 class="t" style="margin-bottom:10px">${L('یک رول پارچه انتخاب کنید','Choose a fabric roll')}</h1>
+   <div style="display:flex;gap:18px;align-items:center"><span class="illu">⚠️ ${L('داده‌های نمونه، مثال‌های نمایشی (Illustrative) هستند، نه نتیجه‌ی اندازه‌گیری','Sample data are illustrative examples, not measured results')}</span><span style="color:var(--dim);font-size:17px">${L('کلیدهای ۱ تا ۹ · آپلود با کلید <bdi>U</bdi> · حالت کارخانه با کلید <bdi>M</bdi>','Keys 1–9 · U = upload · M = Mill mode')}</span></div>
    <div class="samples many">${SKEYS().map((k,i)=>`<div class="sample" role="button" tabindex="0" data-s="${k}"><span class="num">${N(i+1)}</span><button class="zoom" ${lbA(ss[k].swatch,tx(ss[k].name))} title="${L('بزرگ‌نمایی','Enlarge')}">⤢</button><div class="im" style="background-image:url('${ss[k].swatch}')"></div>${ss[k].cat?`<span class="catb">${tx(ss[k].cat)}</span>`:''}<div class="tx"><h3>${tx(ss[k].name)}</h3><p>${tx(ss[k].short)}</p><p class="rl">${rollTxt(ss[k])}</p></div></div>`).join('')}
     <label class="sample upload" tabindex="0" id="upl"><span class="num">U</span><div class="im"><div class="plus">+</div></div><div class="tx"><h3>${L('عکس پارچه‌ی خودتان','Your own fabric photo')}</h3><p>${L('آپلود از همین دستگاه — تحلیل زنده در دستیار انجام می‌شود','Upload from this device — live analysis runs in the assistant')}</p></div><input type="file" accept="image/*" id="file" style="display:none"></label></div></div>`;
   $('#demo').querySelectorAll('[data-s]').forEach(b=>{b.onclick=e=>{ if(e.target.closest('[data-lb]')) return; startRun(ss[b.dataset.s]); }; b.onkeydown=e=>{ if(e.target!==b) return; if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();startRun(ss[b.dataset.s]);} };});
   const up=$('#upl'); up.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();$('#file').click();} };
   $('#file').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>startRun({id:'up',upload:true,swatch:rd.result,name:{fa:'پارچه‌ی آپلودشده',en:'Uploaded fabric'},short:{fa:f.name,en:f.name}});rd.readAsDataURL(f);};
+  bindModeSw();
 }
-function startRun(s){ R.sample=s; R.idx=-1; R.done=['IN']; R.waiting=false; R.resolver=null; R.approvals={}; R.paused=false; R.skip=false; R.cur=null; R.t0=Date.now(); R.t1=0; R.view='run'; renderRun(); loop(0); }
+function startRun(s){ STEPS=(s&&s.mill)?MSTEPS:ASTEPS; R.sample=s; R.idx=-1; R.done=['IN']; R.waiting=false; R.resolver=null; R.approvals={}; R.paused=false; R.skip=false; R.cur=null; R.t0=Date.now(); R.t1=0; R.view='run'; renderRun(); loop(0); }
 
 function renderRun(){
   const s=smp();
   $('#demo').innerHTML=`<div class="runview"><div class="rail">
-     <div class="src-card"><img src="${s.swatch}" alt="" ${lbA(s.swatch,tx(s.name))}><div><b>${tx(s.name)}</b><span>${s.upload?tx(s.short):rollTxt(s)}</span></div></div>
+     <div class="src-card"><img src="${s.swatch}" alt="" ${lbA(s.swatch,tx(s.name))}><div><b>${tx(s.name)}</b><span>${(s.upload||s.mill)?tx(s.short):rollTxt(s)}</span></div></div>
      <div class="steps" id="steps"></div>
-     <div style="display:flex;gap:10px"><button class="ghost" id="bBack">↩ ${L('پارچه‌ی دیگر','Other fabric')}</button><button class="ghost" id="bRe">↺ ${L('از اول','Restart')}</button></div>
+     <div style="display:flex;gap:10px"><button class="ghost" id="bBack">↩ ${s.mill?L('کارخانه‌ی دیگر','Other mill'):L('پارچه‌ی دیگر','Other fabric')}</button><button class="ghost" id="bRe">↺ ${L('از اول','Restart')}</button></div>
    </div><div class="main"><div class="status" id="status"><div class="spin"></div><div class="msg" id="msg"></div><div class="ctl"><button class="ghost" id="bPause" title="Pause">${R.paused?'▶':'⏸'}</button><button class="ghost" id="bSkip">⏭ ${L('رد شو','Skip')}</button></div></div><div class="out" id="out"></div></div></div>`;
   $('#bBack').onclick=()=>renderPick(); $('#bRe').onclick=()=>startRun(R.sample);
   $('#bPause').onclick=()=>{R.paused=!R.paused;$('#bPause').textContent=R.paused?'▶':'⏸';};
@@ -298,7 +347,7 @@ function renderRail(){
   const el=$('#steps'); if(!el) return;
   el.onclick=e=>{const st=e.target.closest('[data-step]'); if(!st) return; const c=$('#out [data-k="'+st.dataset.step+'"]'); if(c){const o=$('#out'); o.scrollTop=Math.max(0,c.offsetTop-o.offsetTop-6); c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash');}};
   el.innerHTML=STEPS.filter(k=>k!=='DONE').map(k=>{const isG=k[0]==='G';const st=R.done.includes(k)?'done':(STEPS[R.idx]===k?(isG?'wait':'run'):'');
-    const nm=isG?tx(GATES[+k[1]-1].n):tx(AG[+k[1]-1].n);
+    const nm=isG?tx(GT()[+k[1]-1].n):tx(agN(k));
     const lab=st==='done'?'✓':(st==='run'?L('در حال اجرا','running'):(st==='wait'?L('منتظر شما','awaiting you'):''));
     return `<div class="step ${isG?'gate':''} ${st}" data-step="${k}"${st?' role="button" tabindex="0"':''}><span class="sid">${k}</span><span>${nm}</span><span class="st">${lab}</span></div>`;}).join('');
 }
@@ -306,7 +355,7 @@ function setStatus(text,cls){const st=$('#status');if(!st)return;st.className='s
 function setStatusNow(){
   const k=STEPS[R.idx]; if(!k) return setStatus('');
   if(k==='DONE') return setStatus('✅ '+L('اجرا کامل شد — همه‌ی خروجی‌ها آماده‌اند','Run complete — all outputs ready'),'idle');
-  if(k[0]==='G') return setStatus('🛡️ '+L('منتظر تأیید انسانی: ','Waiting for human approval: ')+`<span class="ltr">${k}</span> — `+tx(GATES[+k[1]-1].n),'gatew');
+  if(k[0]==='G') return setStatus('🛡️ '+L('منتظر تأیید انسانی: ','Waiting for human approval: ')+`<span class="ltr">${k}</span> — `+tx(GT()[+k[1]-1].n),'gatew');
   if(R.cur&&R.cur.k===k) setStatus(MSG[k][S.lang][R.cur.mi]+'<span class="cur"></span>');
 }
 async function typeMsg(k,mi,g){
@@ -349,6 +398,7 @@ function card0(k,anim){
   if(k[0]==='G') return gateCard(k,a);
   if(k==='DONE') return doneCard(a);
   if(k==='IN') return inCard(a);
+  if(k[0]==='M') return millCard(k,a);
   if(s.upload) return upCard(k,a);
   if(k==='A1') return `<div class="oc"${a}>${hdr('A1','🪪 '+L('شناسنامه‌ی دیجیتال پارچه','Fabric Digital Passport'))}
     <table class="tb"><thead><tr><th>${L('ویژگی','Attribute')}</th><th>${L('مقدار','Value')}</th><th>${L('اطمینان','Tier')}</th><th>${L('شاهد','Evidence')}</th><th>${L('ارجاع','Escalation')}</th></tr></thead><tbody>
@@ -388,7 +438,7 @@ function card0(k,anim){
   return '';
 }
 function inCard(a){
-  const s=smp();
+  const s=smp(); if(s.mill) return millIn(a);
   const live=`<div class="livenote" style="margin:14px 0 0">🤖 ${L('تحلیل زنده در دستیار انجام می‌شود — این عکس را در چت برای دستیار بفرستید.','Live analysis runs in the assistant — send this photo to the assistant in chat.')}</div>`;
   return `<div class="oc"${a}><div class="oh"><span class="aid">IN</span><h3>📷 ${L('ورودی: عکس رول پارچه','Input: fabric roll photo')}</h3></div>
    <div style="display:grid;grid-template-columns:440px 1fr;gap:26px;align-items:start"><img src="${s.swatch}" alt="" ${lbA(s.swatch,tx(s.name))} style="width:100%;height:300px;object-fit:${s.upload?'contain':'cover'};border-radius:18px;background:#000;display:block">
@@ -399,13 +449,14 @@ function inCard(a){
     <tr><td>${L('مخاطب','User')}</td><td>${L('تولیدکننده‌ی پوشاک','Apparel manufacturer')}</td></tr></tbody></table>${s.upload?live:''}</div></div></div>`;
 }
 function gateCard(k,a){
-  const G=GATES[+k[1]-1]; const ok=R.approvals[k];
+  const G=GT()[+k[1]-1]; const ok=R.approvals[k];
   if(ok) return `<div class="oc gatecard" style="animation:none;padding:14px 24px" id="gate-${k}"><div class="oh" style="margin:0"><span class="aid" style="background:var(--gold)">${k}</span><h3 style="font-size:20px">✓ ${tx(G.n)} — ${L('تأیید شد توسط','approved by')} ${tx(G.own)}</h3><span class="mono" style="margin-inline-start:auto;color:var(--dim);font-size:15px">${ok.toLocaleTimeString('en-GB')}</span></div></div>`;
   return `<div class="oc gatecard"${a} id="gate-${k}"><div class="oh"><span class="aid" style="background:var(--gold)">${k}</span><h3>🛡️ ${L('دروازه‌ی تأیید انسانی','Human approval gate')} — ${tx(G.n)}</h3></div>
    <p>${tx(G.d)}</p><p>👤 ${L('مسئول','Owner')}: <b style="color:var(--tx)">${tx(G.own)}</b></p>
    <div style="display:flex;gap:14px;margin-top:16px;align-items:center"><button class="approve" data-approve="1">✓ ${L('تأیید و ادامه','Approve & continue')}</button><span style="color:var(--dim);font-size:16px">${L('یا Enter / PageDown','or Enter / PageDown')}</span></div></div>`;
 }
 function doneCard(a){
+  if(smp().mill) return millDone(a);
   const s=smp(); const secs=Math.round(((R.t1||Date.now())-R.t0)/1000);
   const b=[L('شناسنامه‌ی پارچه','Fabric passport'),L('تحلیل بازار','Market brief'),L('۳ پیشنهاد + رندر','3 proposals + render'),L('تک‌پک و مارکر','Tech pack & marker'),L('برنامه‌ی تولید + «تولید نکن»','Plan + do-not-produce'),L('فایل ماشین','Machine file'),L('پست اینستاگرام','Instagram post')];
   return `<div class="oc final"${a}><div class="ok">✅</div><h2 class="gt">${L('از رول تا تولید — کامل شد','Roll to Run — complete')}</h2><p>${s.upload?L('پیش‌نمایش جریان کار؛ تحلیل واقعی این عکس در دستیار انجام می‌شود.','Workflow preview; the real analysis of this photo runs in the assistant.'):L('۸ ایجنت · ۴ تأیید انسانی · زمان اجرا: ','8 agents · 4 human approvals · run time: ')+`<b>${N(secs)} ${L('ثانیه','s')}</b>`}</p>
@@ -424,6 +475,111 @@ function upCard(k,a){
     A6:L('کپشن فارسی اینستاگرام با انضباط ادعا.','Persian Instagram caption with claim discipline.'),
     A8:L('برنامه‌ی کنترل کیفیت بصری.','Vision QC plan.')}[k];
   return `<div class="oc"${a}>${hdr(k,ag.ic+' '+tx(ag.n),`<span class="illu" style="border-color:rgba(34,211,238,.6);color:#a5f3fc">LIVE · ${L('در دستیار','in the assistant')}</span>`)}${k==='A1'?live:''}<div class="ph">${what}</div></div>`;
+}
+/* ---------------- MILL MODE (added; apparel flow above is untouched) ---------------- */
+const MAG=[
+ {id:'M1',ic:'📡',n:{fa:'نبض بازار',en:'Market Pulse'}},
+ {id:'M2',ic:'📦',n:{fa:'سبد محصول و موجودی',en:'Portfolio & stock'}},
+ {id:'M3',ic:'⚖️',n:{fa:'تصمیم بافت/چاپ + رنگ‌بندی',en:'Weave/print decision + colourways'}},
+ {id:'M4',ic:'🧊',n:{fa:'انبار راکد و فروش B2B',en:'Dead stock & B2B clearance'}},
+ {id:'M5',ic:'👁️',n:{fa:'هوش کیفیت: عیب و شید',en:'Quality AI: defects & shade'}},
+ {id:'M6',ic:'🏭',n:{fa:'تحویل به ماشین',en:'Machine handoff'}}];
+const MGATES=[
+ {id:'G1',n:{fa:'گزارش بازار پذیرفته شد',en:'Market brief accepted'},own:{fa:'مدیر فروش / بازاریابی',en:'Sales / marketing manager'},d:{fa:'سیگنال‌ها جهت‌دار و نمونه‌اند؛ مدیر فروش آن‌ها را با سفارش‌های واقعی و شناخت مشتریان مقایسه و تأیید می‌کند.',en:'Signals are directional samples; the sales manager checks them against real orders and customer knowledge before they drive any decision.'}},
+ {id:'G2',n:{fa:'ترکیب تولید و رنگ‌بندی تأیید شد',en:'Weave/print mix & colourways approved'},own:{fa:'مدیر برنامه‌ریزی + طراح ارشد',en:'Planning manager + chief designer'},d:{fa:'هیچ تغییری در برنامه‌ی ماشین‌ها بدون امضای برنامه‌ریزی و طراح ارشد انجام نمی‌شود؛ سهم خلاقانه‌ی طراح ثبت می‌شود.',en:'No loom or printer schedule changes without planning and the chief designer signing off; the designer’s creative input is recorded.'}},
+ {id:'G3',n:{fa:'آزادسازی کیفیت و شید',en:'Quality & shade release'},own:{fa:'مدیر کنترل کیفیت / آزمایشگاه رنگ',en:'QC manager / colour lab'},d:{fa:'عیب‌های کم‌اطمینان را انسان بازبینی می‌کند؛ لات‌های خارج از تلرانس جدا یا اصلاح می‌شوند؛ اسپکتروفتومتر مرجع نهایی است.',en:'Low-confidence defects get human review; out-of-tolerance lots are separated or corrected; the spectrophotometer stays the final reference.'}},
+ {id:'G4',n:{fa:'فایل ماشین آزاد شد',en:'Machine files released'},own:{fa:'تکنسین بافندگی / چاپ',en:'Loom / print technician'},d:{fa:'فایل فقط پس از نمونه‌ی بافت یا استرایک‌آف و تأیید تکنسین به ماشین می‌رود؛ هیچ ارسال خودکاری وجود ندارد.',en:'The file goes to the machine only after a blanket sample or strike-off and the technician’s approval; nothing is auto-sent.'}}];
+const MSTEPS=['M1','G1','M2','M3','G2','M4','M5','G3','M6','G4','DONE'];
+Object.assign(MSG,{
+ M1:{fa:['الان داره کاتالوگ نمونه‌ی فروشگاه‌های آنلاین رو می‌خونه...','الان داره طرح، رنگ، الیاف، گرماژ و عرض پرفروش رو استخراج می‌کنه...','الان داره روند هر سیگنال رو حساب می‌کنه...'],en:['Reading the prepared online-shop catalogue...','Extracting trending designs, colours, fibres, weights and widths...','Scoring the trend of each signal...']},
+ M2:{fa:['الان داره سبد محصول کارخانه رو با نبض بازار تطبیق می‌ده...','الان داره ماه‌های پوشش موجودی هر کالا رو حساب می‌کنه...'],en:['Matching the mill’s product list against the market pulse...','Calculating months of stock cover for every article...']},
+ M3:{fa:['الان داره برای هر کالا تصمیم بیشتر / کمتر / توقف می‌گیره...','الان داره رنگ‌بندی فصل بعد رو تولید می‌کنه...'],en:['Deciding MORE / REDUCE / STOP for every article...','Generating next-season colourways...']},
+ M4:{fa:['الان داره رول‌های راکد رو پیدا می‌کنه...','الان داره رول‌ها رو با تولیدی‌های پوشاک تطبیق B2B می‌ده...'],en:['Finding slow-moving rolls...','B2B-matching unsold rolls to apparel makers...']},
+ M5:{fa:['الان داره تصویر میز بازرسی رو برای عیب بررسی می‌کنه...','الان داره امتیاز سیستم ۴ امتیازی رو حساب می‌کنه...','الان داره اختلاف رنگ لات‌ها (ΔE) رو می‌سنجه...'],en:['Scanning the inspection-table image for defects...','Scoring the roll with the 4-point system...','Measuring lot-to-lot shade difference (ΔE)...']},
+ M6:{fa:['الان داره فایل ماشین بافندگی/چاپ رو می‌سازه...','الان داره فایل رو با قرارداد تحویل اعتبارسنجی می‌کنه...'],en:['Building the loom / print machine file...','Validating the file against its handoff contract...']}
+});
+const isMill=()=>!!(R.sample&&R.sample.mill);
+const GT=()=>isMill()?MGATES:GATES;
+const agN=k=>k[0]==='M'?MAG[+k[1]-1].n:AG[+k[1]-1].n;
+const MKEYS=()=>Object.keys(window.R2R_MILLS||{}).sort((a,b)=>+a.slice(1)-+b.slice(1));
+const MBADGE=()=>`<span class="illu millb">⚠️ ${L('داده‌ی نمونه‌ی نمایشی (Illustrative) · اتصال زنده در مرحله‌ی استقرار','Illustrative sample data · live connectors in deployment')}</span>`;
+const msrc=k=>tx((window.R2R_MSRC||{})[k]||k);
+const mvb=s=>s.id==='m2'?L('چاپ','PRINT'):L('بافت','WEAVE');
+const mdec=(d,s)=>`<span class="mdec ${d}">${d==='more'?(S.lang==='fa'?mvb(s)+' بیشتر':mvb(s)+' MORE'):d==='reduce'?L('کاهش','REDUCE'):d==='stop'?L('توقف','STOP'):d==='new'?L('طرح جدید','NEW'):L('ادامه','KEEP')}</span>`;
+const cov=p=>p.stock/p.sales;
+const covC=c=>c>6?'bad':c>3?'mid':'good';
+function millCard(k,a){
+  const s=smp(), ag=MAG[+k[1]-1]; const H=t=>hdr(k,ag.ic+' '+t,MBADGE());
+  if(k==='M1'){ const mx=Math.max(...s.pulse.map(p=>Math.abs(p.t)));
+    return `<div class="oc"${a}>${H(L('نبض بازار: چه طرح، رنگ و الیافی الان می‌فروشد؟','Market Pulse: which designs, colours & fibres sell now?'))}
+    <table class="tb"><thead><tr><th>${L('بُعد','Dimension')}</th><th>${L('سیگنال','Signal')}</th><th style="width:290px">${L('روند تقاضا','Demand trend')}</th><th>${L('منبع','Source')}</th><th>${L('اطمینان','Tier')}</th></tr></thead><tbody>
+    ${s.pulse.map(p=>`<tr><td><b>${tx(p.d)}</b></td><td>${tx(p.s)}</td><td><div class="tbar ${p.t<0?'dn':'up'}"><i style="width:${Math.max(8,Math.round(Math.abs(p.t)/mx*100))}%"></i><b class="ltr">${p.t<0?'−':'+'}${N(Math.abs(p.t))}%</b></div></td><td style="font-size:16px">${msrc(p.src)}</td><td>${tierTag(p.c)}</td></tr>`).join('')}</tbody></table>
+    <p class="mnote">🔌 ${L('در استقرار: اتصال به فروشگاه‌های آنلاین، آگهی‌های بازار، سفارش عمده‌فروشان و فروش ERP خود کارخانه. روی صحنه: کاتالوگ نمونه‌ی آماده.','In deployment: connectors to online shops, marketplace listings, wholesaler orders and the mill’s own ERP sales. On stage: a prepared illustrative catalogue.')}</p></div>`;}
+  if(k==='M2'){ const tot=s.portfolio.reduce((t,p)=>t+p.stock,0);
+    return `<div class="oc"${a}>${H(L('سبد محصول و موجودی در برابر بازار','Portfolio & stock vs the market'))}
+    <table class="tb"><thead><tr><th>${L('کد','Code')}</th><th>${L('کالا','Article')}</th><th>${L('مشخصات','Spec')}</th><th>${L('موجودی','Stock')}</th><th>${L('فروش ماهانه','Sales / month')}</th><th>${L('پوشش موجودی','Stock cover')}</th></tr></thead><tbody>
+    ${s.portfolio.map(p=>`<tr><td class="ltr"><b>${p.code}</b></td><td>${tx(p.n)}</td><td class="mono" style="font-size:15px">${p.spec}</td><td><b>${N(p.stock.toLocaleString('en-US'))} m</b></td><td>${N(p.sales.toLocaleString('en-US'))} m</td><td><span class="cov ${covC(cov(p))}">${fmt(cov(p))} ${L('ماه','mo')}</span></td></tr>`).join('')}</tbody></table>
+    <div class="legend" style="margin-top:12px"><span>${L('جمع موجودی','Total stock')}: <b>${N(tot.toLocaleString('en-US'))} m</b> · ${L('پوشش = موجودی ÷ فروش ماهانه','Cover = stock ÷ monthly sales')} · <span class="cov good">≤ ${N(3)}</span> <span class="cov mid">${N(3)}–${N(6)}</span> <span class="cov bad">&gt; ${N(6)} ${L('ماه','mo')}</span></span></div></div>`;}
+  if(k==='M3'){ const na=s.newArt;
+    return `<div class="oc"${a}>${H(L('تصمیم: بیشتر / کمتر / توقف — با دلیل','Decision: MORE / REDUCE / STOP — with reasons'))}
+    <table class="tb"><thead><tr><th>${L('تصمیم','Decision')}</th><th>${L('کد','Code')}</th><th>${L('کالا','Article')}</th><th>${L('دلیل','Reason')}</th></tr></thead><tbody>
+    ${s.portfolio.map(p=>`<tr><td>${mdec(p.dec,s)}</td><td class="ltr"><b>${p.code}</b></td><td>${tx(p.n)}</td><td>${tx(p.why)}</td></tr>`).join('')}
+    <tr class="newrow"><td>${mdec('new',s)}</td><td class="ltr"><b>${na.code}</b></td><td>${tx(na.n)}<div class="mono" style="font-size:14px;color:var(--dim)">${na.spec}</div></td><td>${tx(na.why)}<div style="color:var(--cy);margin-top:4px">${tx(na.plan)}</div></td></tr></tbody></table>
+    <h3 class="msub">🎨 ${L('رنگ‌بندی فصل بعد','Next-season colourways')} — <span class="ltr">${na.code}</span></h3>
+    <div class="cws">${s.colourways.map((c,i)=>`<div class="cw"><img src="${c.img}" alt="" ${lbA(c.img,na.code+' · '+tx(c.n))}><div class="cb"><i style="background:${c.hex}"></i><b>${tx(c.n)}</b><span class="mono">${c.hex}</span></div></div>`).join('')}</div></div>`;}
+  if(k==='M4'){ const d=s.dead, tot=d.rolls.reduce((t,r)=>t+r.m,0), mt=d.b2b.reduce((t,b)=>t+b.m,0);
+    return `<div class="oc"${a}>${H(L('ریسک انبار راکد و فروش B2B','Dead-stock risk & B2B clearance'))}
+    <div class="grid g2" style="gap:24px"><div><table class="tb"><thead><tr><th>${L('رول','Roll')}</th><th>${L('متراژ','Metres')}</th><th>${L('ماندگاری','Age')}</th><th>${L('ریسک','Risk')}</th></tr></thead><tbody>
+     ${d.rolls.map(r=>`<tr><td><b class="ltr">${r.code}</b><div style="font-size:15px">${tx(r.n)}</div></td><td><b>${N(r.m.toLocaleString('en-US'))} m</b></td><td>${N(r.age)} ${L('روز','days')}<div class="agebar"><i style="width:${Math.min(100,Math.round(r.age/450*100))}%"></i></div></td><td><span class="cov ${r.age>=365?'bad':'mid'}">${r.age>=365?L('بالا','High'):L('متوسط','Medium')}</span></td></tr>`).join('')}</tbody></table>
+     <ul style="margin-top:12px">${d.actions.map(x=>`<li>${tx(x)}</li>`).join('')}</ul></div>
+     <div><h3 class="msub" style="margin-top:0">🤝 ${L('تطبیق B2B با تولیدی‌های پوشاک','B2B matches with apparel makers')}</h3><table class="tb"><tbody>
+     ${d.b2b.map(b=>`<tr><td>${tx(b.who)}</td><td class="ltr"><b>${b.code}</b></td><td><b>${N(b.m.toLocaleString('en-US'))} m</b></td></tr>`).join('')}</tbody></table>
+     <div class="clr"><div class="clrbar"><i style="width:${Math.round(Math.min(1,mt/tot)*100)}%"></i></div><span>${L('تطبیق‌شده','Matched')}: <b>${N(mt.toLocaleString('en-US'))}</b> / ${N(tot.toLocaleString('en-US'))} m (${N(Math.round(mt/tot*100))}%)</span></div>
+     <p class="mnote">${L('خریداران نمونه و فرضی‌اند؛ در استقرار، از شبکه‌ی خریداران و تاریخچه‌ی سفارش کارخانه می‌آیند.','Buyers are fictional samples; in deployment they come from the mill’s buyer network and order history.')}</p></div></div></div>`;}
+  if(k==='M5'){ const q=s.quality, sh=q.shade, pts=q.boxes.reduce((t,b)=>t+b.p,0), per=pts*3600/(q.yd*q.win);
+    const grp=de=>de<=sh.tol?['ok',L('قبول · گروه A','Pass · group A')]:de<=sh.tol*1.5?['mid',L('گروه شید جدا (B)','Separate shade group (B)')]:['bad',L('نگه‌دار / اصلاح دستور','Hold / correct recipe')];
+    return `<div class="oc"${a}>${H(L('هوش کیفیت: تشخیص عیب و تطبیق شید','Quality AI: defect detection & shade matching'))}
+    <div class="qgrid"><div><div class="defimg" ${lbA(q.boxed,tx(q.insp))}><img src="${q.img}" alt="">${q.boxes.map((b,i)=>`<div class="dbx ${b.c<0.5?'rev':''}" style="left:${b.x}%;top:${b.y}%;width:${b.w}%;height:${b.h}%"><span>${N(i+1)} · ${N(Math.round(b.c*100))}%</span></div>`).join('')}</div><div class="cap2">📷 ${tx(q.insp)}</div></div>
+    <div><table class="tb"><thead><tr><th>#</th><th>${L('عیب','Defect')}</th><th>${L('اطمینان','Conf.')}</th><th>${L('امتیاز','Points')}</th></tr></thead><tbody>
+     ${q.boxes.map((b,i)=>`<tr><td>${N(i+1)}</td><td>${tx(b.n)}</td><td><b class="${b.c<0.5?'lowc':''}">${N(Math.round(b.c*100))}%</b></td><td>${b.c<0.5?`<span class="cov mid">${L('بازبینی انسانی','Human review')}</span>`:N(b.p)}</td></tr>`).join('')}</tbody></table>
+     <div class="score"><b class="ltr">${fmt(per)}</b><span>${L('امتیاز در ۱۰۰ یارد مربع (سیستم ۴ امتیازی، ASTM D5430)','points per 100 yd² (4-point system, ASTM D5430)')}<br><small class="ltr">${pts} × 3600 ÷ (${q.yd} yd × ${q.win} in)</small> · ${per<=40?`<span class="cov good">${L('زیر حد رایج ۴۰ — درجه‌ی یک','Under the common 40 limit — first quality')}</span>`:`<span class="cov bad">${L('بالای حد ۴۰','Over the 40 limit')}</span>`}</span></div></div></div>
+    <h3 class="msub">🎯 ${L('تطبیق شید لات‌ها','Lot shade matching')} — ${tx(sh.art)} · ΔE₀₀ ${L('تلرانس','tolerance')} ≤ ${fmt(sh.tol)}</h3>
+    <div class="lots"><div class="lot std"><i style="background:${sh.std}"></i><b>${L('استاندارد','Standard')}</b><span class="mono">${sh.std}</span></div>
+     ${sh.lots.map(l=>{const g=grp(l.de);return `<div class="lot ${g[0]}"><i style="background:${l.hex}"></i><b class="ltr">${l.l}</b><span>ΔE₀₀ <b>${fmt(l.de)}</b></span><em>${g[1]}</em></div>`;}).join('')}</div>
+    <p class="mnote">🔬 ${L('ΔE دوربین فقط غربالگری است؛ تصمیم نهایی شید با اسپکتروفتومتر زیر نور D65 و تلرانس قرارداد خریدار.','Camera ΔE is screening only; the final shade decision uses a spectrophotometer under D65 and the buyer’s contract tolerance.')}</p></div>`;}
+  if(k==='M6') return `<div class="oc"${a}>${H(L('فایل آماده‌ی ماشین','Machine-ready file'))}
+    <div class="file"><div class="fi">${s.machine.file.split('.').pop().toUpperCase()}</div><div><b class="mono">${s.machine.file}</b><p>${tx(s.machine.target)}</p></div></div>
+    <ul>${s.machine.checks.map(x=>`<li>${tx(x)}</li>`).join('')}</ul>
+    <p style="margin-top:10px;color:var(--gold)">🛑 ${L('فایل منتظر آزادسازی در G4 است؛ هیچ ارسال خودکاری به ماشین انجام نمی‌شود.','File is held for release at G4; nothing is auto-sent to a machine.')}</p></div>`;
+  return '';
+}
+function millIn(a){
+  const s=smp();
+  return `<div class="oc"${a}><div class="oh"><span class="aid">IN</span><h3>🏭 ${L('ورودی: پروفایل کارخانه + سبد محصول + موجودی','Input: mill profile + product list + stock')}</h3>${MBADGE()}</div>
+   <div style="display:grid;grid-template-columns:400px 1fr;gap:26px;align-items:start"><img src="${s.swatch}" alt="" ${lbA(s.swatch,tx(s.name))} style="width:100%;height:290px;object-fit:cover;border-radius:18px;background:#000;display:block">
+   <div><table class="tb"><tbody><tr><td>${L('کارخانه','Mill')}</td><td><b>${tx(s.name)}</b></td></tr>
+    ${s.profile.map(r=>`<tr><td>${tx(r[0])}</td><td>${tx(r[1])}</td></tr>`).join('')}
+    <tr><td>${L('مخاطب','User')}</td><td>${L('کارخانه‌ی نساجی (بافندگی، چاپ و تکمیل)','Textile mill (weaving, printing & finishing)')}</td></tr></tbody></table></div></div></div>`;
+}
+function millDone(a){
+  const s=smp(); const secs=Math.round(((R.t1||Date.now())-R.t0)/1000);
+  const b=[L('گزارش نبض بازار','Market Pulse brief'),L('تصمیم بیشتر / کمتر / توقف','MORE / REDUCE / STOP decisions'),L('۳ رنگ‌بندی فصل بعد','3 next-season colourways'),L('برنامه‌ی تخلیه‌ی انبار راکد + تطبیق B2B','Dead-stock plan + B2B matches'),L('گزارش عیب + امتیاز ۴ نقطه‌ای','Defect report + 4-point score'),L('تفکیک شید لات‌ها (ΔE)','Lot shade sorting (ΔE)'),L('فایل ماشین','Machine file')+' · '+s.machine.file.split('.').pop().toUpperCase()];
+  return `<div class="oc final"${a}><div class="ok">✅</div><h2 class="gt">${L('از داده‌ی بازار تا ماشین — کامل شد','Market to machine — complete')}</h2><p>${L(`${N(secs)} ثانیه · ۶ ایجنت کارخانه · ۴ تأیید انسانی`,`${secs} s · 6 mill agents · 4 human approvals`)}</p>
+   <div class="bundle">${b.map(x=>`<span class="tag" style="height:40px;font-size:17px">📦 ${x}</span>`).join('')}</div>
+   <p style="margin-top:20px;font-size:17px;color:var(--dim)">${L('نام کارخانه فرضی است و همه‌ی مقادیر داده‌ی نمونه‌ی نمایشی‌اند؛ اتصال زنده در مرحله‌ی استقرار.','The mill name is fictional and all values are illustrative sample data; live connectors come with deployment.')}</p></div>`;
+}
+const modeSw=()=>`<div class="modesw" role="tablist"><button role="tab" data-mode="apparel" aria-selected="${R.pmode!=='mill'}" class="${R.pmode!=='mill'?'on':''}">👕 ${L('حالت پوشاک','Apparel mode')}</button><button role="tab" data-mode="mill" aria-selected="${R.pmode==='mill'}" class="${R.pmode==='mill'?'on':''}">🏭 ${L('حالت کارخانه نساجی','Mill mode')}</button></div>`;
+function bindModeSw(){ $('#demo').querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>setPickMode(b.dataset.mode)); }
+function setPickMode(m){ R.pmode=m==='mill'?'mill':'apparel'; renderPick(); }
+function openMill(){ R.pmode='mill'; R.view='pick'; openDemo(); }
+function renderMillPick(){
+  const ms=window.R2R_MILLS||{};
+  $('#demo').innerHTML=`<div class="demo-pick"><div class="pickhd"><div class="kicker">${L('دموی زنده · حالت کارخانه نساجی','Live demo · Mill mode')}</div>${modeSw()}</div><h1 class="t" style="margin-bottom:10px">${L('یک کارخانه‌ی نمونه انتخاب کنید','Choose a sample mill')}</h1>
+   <div style="display:flex;gap:18px;align-items:center">${MBADGE()}<span style="color:var(--dim);font-size:17px">${L('کلیدهای ۱ تا ۳ · حالت پوشاک با کلید <bdi>M</bdi>','Keys 1–3 · M = Apparel mode')}</span></div>
+   <div class="samples mills">${MKEYS().map((k,i)=>{const m=ms[k];return `<div class="sample" role="button" tabindex="0" data-mill="${k}"><span class="num">${N(i+1)}</span><button class="zoom" ${lbA(m.swatch,tx(m.name))} title="${L('بزرگ‌نمایی','Enlarge')}">⤢</button><div class="im" style="background-image:url('${m.swatch}')"></div><span class="catb">${tx(m.cat)}</span><div class="tx"><h3>${tx(m.name)}</h3><p>${tx(m.short)}</p><p class="rl">❓ ${tx(m.profile[3][1])}</p></div></div>`;}).join('')}</div>
+   <div class="millflow">${MAG.map(g=>`<span><b class="ltr">${g.id}</b> ${g.ic} ${tx(g.n)}</span>`).join('<i>→</i>')}<span class="g">🛡️ <b class="ltr">G1–G4</b></span></div></div>`;
+  $('#demo').querySelectorAll('[data-mill]').forEach(b=>{b.onclick=e=>{ if(e.target.closest('[data-lb]')) return; startRun(ms[b.dataset.mill]); }; b.onkeydown=e=>{ if(e.target!==b) return; if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();startRun(ms[b.dataset.mill]);} };});
+  bindModeSw();
 }
 /* ---------------- CHROME / LANG / KEYS ---------------- */
 const isStandalone=()=>{try{return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||(window.matchMedia&&matchMedia('(display-mode: fullscreen)').matches)||navigator.standalone===true;}catch(e){return false;}};
@@ -456,7 +612,7 @@ function updNet(){
 }
 function renderHelp(){
   const touch=L('روی آیپد: برای اسلاید بعدی/قبلی انگشت را به چپ/راست بکشید یا دکمه‌های پایین صفحه را بزنید. روی هر تصویر بزنید تا بزرگ شود.','On iPad: swipe left/right or use the arrows at the bottom to change slides. Tap any image to enlarge it.');
-  const rows=[['PageDown / Space / ↓',L('بعدی (در دمو: ادامه / تأیید)','Next (demo: advance / approve)')],['PageUp / ↑',L('قبلی (در دمو: انتخاب پارچه)','Previous (demo: back to fabrics)')],[S.lang==='fa'?'← / →':'→ / ←',L('بعدی / قبلی (جهت با زبان عوض می‌شود)','Next / previous (direction follows language)')],['D',L('دموی زنده','Live demo')],['Esc / S',L('بازگشت','Back')],['1 … 9 · U',L('انتخاب پارچه در دمو · U = آپلود عکس','Pick a fabric in the demo · U = upload a photo')],['L',L('تغییر زبان فارسی / English','Toggle FA / EN')],['F',L('تمام‌صفحه','Fullscreen')],['Home / End',L('اولین / آخرین اسلاید','First / last slide')],['?',L('راهنما','Help')]];
+  const rows=[['PageDown / Space / ↓',L('بعدی (در دمو: ادامه / تأیید)','Next (demo: advance / approve)')],['PageUp / ↑',L('قبلی (در دمو: انتخاب پارچه)','Previous (demo: back to fabrics)')],[S.lang==='fa'?'← / →':'→ / ←',L('بعدی / قبلی (جهت با زبان عوض می‌شود)','Next / previous (direction follows language)')],['D',L('دموی زنده','Live demo')],['Esc / S',L('بازگشت','Back')],['1 … 9 · U',L('انتخاب پارچه در دمو · U = آپلود عکس','Pick a fabric in the demo · U = upload a photo')],['M',L('حالت کارخانه نساجی (در دمو: تعویض پوشاک / کارخانه · ۱–۳ = کارخانه)','Mill mode (in the demo: toggle Apparel / Mill · 1–3 = mill)')],['L',L('تغییر زبان فارسی / English','Toggle FA / EN')],['F',L('تمام‌صفحه','Fullscreen')],['Home / End',L('اولین / آخرین اسلاید','First / last slide')],['?',L('راهنما','Help')]];
   $('#help').innerHTML=`<div class="card"><button class="hx" aria-label="close">✕</button><h3>⌨️ ${L('راهنما و کلیدها','Help & shortcuts')}</h3><p style="margin-bottom:12px">👆 ${touch}</p><table>${rows.map(r=>`<tr><td><kbd>${r[0]}</kbd></td><td>${r[1]}</td></tr>`).join('')}</table><p style="margin-top:16px;font-size:17px">${L('برای بستن، هر جا بزنید یا هر کلیدی را فشار دهید.','Tap anywhere or press any key to close.')}</p></div>`;
 }
 function fit(){const w=window.innerWidth,h=window.innerHeight;const sc=Math.min(w/1920,h/1080);$('#stage').style.transform=`scale(${sc})`;S.scale=sc;
@@ -481,7 +637,7 @@ function setLite(on,save){ document.documentElement.classList.toggle('lite',on);
 /* ---------------- LIGHTBOX ---------------- */
 const LB={open:false,items:[],i:0,wasPaused:false};
 function lbOpen(el){
-  const scope=el.closest('.oc')||el.closest('.rail')||el.closest('.samples')||document;
+  const scope=el.closest('.oc')||el.closest('.rail')||el.closest('.samples')||el.closest('.slide')||document;
   const items=[...scope.querySelectorAll('[data-lb]')]; const seen=new Set(); LB.items=[];
   items.forEach(x=>{const k=x.dataset.lb+'|'+x.dataset.tile; if(seen.has(k))return; seen.add(k); LB.items.push({src:x.dataset.lb,cap:x.dataset.cap||'',tile:!!x.dataset.tile});});
   LB.i=Math.max(0,LB.items.findIndex(it=>it.src===el.dataset.lb&&it.tile===!!el.dataset.tile));
@@ -522,10 +678,13 @@ document.addEventListener('keydown',e=>{
     if(dir){go(S.slide+dir);e.preventDefault();return;}
     if(k==='Home'){go(0);return;} if(k==='End'){go(SL.length-1);return;}
     if(k==='d'||k==='D'){openDemo();return;}
+    if(k==='m'||k==='M'){openMill();return;}
     if(k==='Enter'&&$('#slides .slide.on [data-act=demo]')){e.preventDefault();openDemo();return;}
   } else {
     if(k==='Escape'||k==='s'||k==='S'){ if(R.view==='run'&&k==='Escape') renderPick(); else closeDemo(); return; }
     if(R.view==='pick'){
+      if(k==='m'||k==='M'){setPickMode(R.pmode==='mill'?'apparel':'mill');return;}
+      if(R.pmode==='mill'){ if(/^[1-9]$/.test(k)){const id=MKEYS()[+k-1]; if(id) startRun(window.R2R_MILLS[id]); return;} if(k==='u'||k==='U'||k==='0') return; }
       if(/^[1-9]$/.test(k)){const id=SKEYS()[+k-1]; if(id){startRun(window.R2R_SAMPLES[id]);return;}}
       if(k==='u'||k==='U'||k==='0'){$('#file').click();return;}
       if(dir===1){e.preventDefault();closeDemo();go(S.slide+1);return;}
@@ -574,7 +733,7 @@ function init(){
       chk();
     }).catch(()=>{});
   }
-  window.R2R={go,openDemo,closeDemo,startRun,advance,approve,setLang,setLite,lbClose,state:S,run:R,lb:LB,samples:window.R2R_SAMPLES};
+  window.R2R={openMill,setPickMode,mills:window.R2R_MILLS,go,openDemo,closeDemo,startRun,advance,approve,setLang,setLite,lbClose,state:S,run:R,lb:LB,samples:window.R2R_SAMPLES};
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
