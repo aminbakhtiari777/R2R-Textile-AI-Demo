@@ -9,6 +9,7 @@ const ASSETS = [
  "js/data-more.js",
  "js/data-mill.js",
  "js/data-chain.js",
+ "assets/img/c1_mill.jpg",
  "assets/img/c1_p1.jpg",
  "assets/img/c1_p2.jpg",
  "assets/img/c1_p3.jpg",
